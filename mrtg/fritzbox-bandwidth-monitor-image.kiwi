@@ -2,7 +2,7 @@
 
 <!-- OBS-ExcludeArch: i586 s390 -->
 
-<image schemaversion="6.9" name="fritzbox-bandwidth-monitor-image" xmlns:suse_label_helper="com.suse.label_helper">
+<image schemaversion="7.4" name="fritzbox-bandwidth-monitor-image">
   <description type="system">
     <author>Thorsten Kukuk</author>
     <contact>kukuk@suse.com</contact>
@@ -25,7 +25,7 @@
           <volume name="/srv/www/htdocs"/>
         </volumes>
         <labels>
-          <suse_label_helper:add_prefix prefix="de.thkukuk.fritzbox-bandwidth-monitor">
+          <suse_label_helper:add_prefix xmlns:suse_label_helper="com.suse.label_helper" prefix="de.thkukuk.fritzbox-bandwidth-monitor">
             <label name="org.opencontainers.image.title" value="Fritzbox Bandwith Monitor"/>
             <label name="org.opencontainers.image.description" value="Image containing mrtg and nginx to collect and display bandwith usage of a Fritzbox."/>
             <label name="org.opencontainers.image.version" value="%PKG_VERSION%-%RELEASE%"/>
