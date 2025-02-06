@@ -26,7 +26,9 @@ setup_timezone() {
 }
 
 setup_files() {
-	cp -r /fritzbox-mrtg/htdocs /srv/www/htdocs
+	if [ ! -f /srv/www/htdocs/style.css ]; then
+		cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
+	fi
 }
 
 stop_nginx() {

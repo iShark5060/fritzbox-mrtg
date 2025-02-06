@@ -43,6 +43,7 @@ RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
 # Fix permission errors
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /fritzbox-mrtg/entrypoint.sh
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
