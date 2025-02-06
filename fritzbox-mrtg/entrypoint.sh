@@ -25,6 +25,10 @@ setup_timezone() {
     fi
 }
 
+setup_files() {
+	cp -r /fritzbox-mrtg/htdocs /srv/www/htdocs
+}
+
 stop_nginx() {
     rv=$?
     [ "${RUN_WEBSERVER}" = "1" ] && nginx -s quit
@@ -48,6 +52,7 @@ remove_files() {
 setup_timezone
 init_trap
 remove_files
+setup_files
 
 # Setup variables
 DL_KBITS=$((${MAX_DOWNLOAD_BYTES}*8/1000))

@@ -24,11 +24,11 @@ RUN apk add --update --no-cache \
 COPY ./fritzbox-mrtg/entrypoint.sh /
 COPY ./fritzbox-mrtg/mrtg.cfg /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/upnp2mrtg.sh /fritzbox-mrtg/
-COPY ./fritzbox-mrtg/style.css /srv/www/htdocs/
-COPY ./fritzbox-mrtg/style_light.css /srv/www/htdocs/
-COPY ./fritzbox-mrtg/mrtg-l.png /srv/www/htdocs/icons/
-COPY ./fritzbox-mrtg/mrtg-m.png /srv/www/htdocs/icons/
-COPY ./fritzbox-mrtg/mrtg-r.png /srv/www/htdocs/icons/
+COPY ./fritzbox-mrtg/style.css /fritzbox-mrtg/htdocs/
+COPY ./fritzbox-mrtg/style_light.css /fritzbox-mrtg/htdocs/
+COPY ./fritzbox-mrtg/mrtg-l.png /fritzbox-mrtg/htdocs/icons/
+COPY ./fritzbox-mrtg/mrtg-m.png /fritzbox-mrtg/htdocs/icons/
+COPY ./fritzbox-mrtg/mrtg-r.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/default.conf /etc/nginx/http.d/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
 
@@ -38,8 +38,8 @@ RUN sed -i -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh
 RUN sed -i -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg
 RUN sed -i -e 's/\r$//' /etc/nginx/http.d/default.conf
 RUN sed -i -e 's/\r$//' /etc/nginx/nginx.conf
-RUN sed -i -e 's/\r$//' /srv/www/htdocs/style.css
-RUN sed -i -e 's/\r$//' /srv/www/htdocs/style_light.css
+RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css
+RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
 # Fix permission errors
 RUN chmod +x /entrypoint.sh
