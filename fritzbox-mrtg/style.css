@@ -1,0 +1,131 @@
+body {
+	background-color: rgb(30, 30, 30);
+	color: rgba(255, 255, 255, 0.85);
+	scrollbar-color: rgba(0, 0, 0, 0.28) rgb(66, 66, 66);
+    scrollbar-width: auto;
+}
+
+h1 {
+	font-family: "Titillium Web", sans-serif;
+	font-size: 26px;
+	font-weight: 600;
+	line-height: 32px;
+	text-align: center;
+	width: 600px;
+	margin-left: 50px;
+}
+
+h2 {
+	font-family: "Titillium Web", sans-serif;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 32px;
+	text-align: center;
+	width: 600px;
+}
+
+p {
+	font-family: "Titillium Web", sans-serif;
+	font-size: 16px;
+	font-weight: 300;
+	line-height: 20px;
+	text-align: center;
+	width: 600px;
+	margin-left: 50px;
+	background-color: rgb(40, 40, 40);
+	border: none;
+	border-radius: 25px;
+	padding: 10px;
+}
+
+div.graph {
+	width: 600px;
+	margin-left: 50px;
+	background-color: rgb(40, 40, 40);
+	border: none;
+	border-radius: 25px;
+	padding: 10px;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+div.graph table {
+	margin: 0 auto;
+}
+
+div.graph th {
+	font-family: "IBM Plex Sans", Roboto, "Helvetica Neue", sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+div.graph td {
+	font-family: "IBM Plex Sans", Roboto, "Helvetica Neue", sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+div.graph img {
+	filter: invert(75%) hue-rotate(175deg) saturate(1000%);
+}
+
+div#sysdetails, div#legend, div#footer {
+	width: 600px;
+	margin-left: 50px;
+	margin-bottom: 5px;
+	background-color: rgb(40, 40, 40);
+	border: none;
+	border-radius: 25px;
+	padding: 10px;
+}
+
+div#legend {
+	margin-bottom: 10px;
+}
+
+div#footer {
+	background-color: rgba(0, 0, 0, 0.1)
+}
+
+div#footer a, div#footer a:visited {
+	color: rgba(255, 255, 255, 0.85);
+}
+
+div#footer a:hover {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+div#footer p {
+	font-family: "Titillium Web", sans-serif;
+	font-size: 16px;
+	font-weight: 300;
+	line-height: 20px;
+	text-align: center;
+	width: unset;
+	margin-left: 0;
+	background-color: unset;
+	border: none;
+	border-radius: unset;
+	padding: 0;
+}
+
+div#sysdetails table, div#legend table {
+	font-family: "IBM Plex Sans", Roboto, "Helvetica Neue", sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	margin-left: 20px;
+}
+
+div#sysdetails > table > tbody > tr > td:nth-child(odd) {
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	width: 250px;
+}
+
+div#sysdetails > table > tbody > tr > td:nth-child(even) {
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+	font-size: 14px;
+	font-weight: 400;
+	width: 250px;
+}
