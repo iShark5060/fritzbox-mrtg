@@ -15,7 +15,7 @@ services:
     image: shark5060/fritzbox-mrtg:latest
     container_name: fritzbox-mrtg
     environment:
-      - TZ=Europe/Berlin
+	  - TZ=Europe/Berlin
 	  - DEBUG=0
 	  - RUN_WEBSERVER=1
 	  - USE_DARKMODE=1
