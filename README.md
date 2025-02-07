@@ -60,7 +60,7 @@ docker run -d \
 - MAX_DOWNLOAD_BYTES 	- Max. incoming traffic in Bytes per Second. Default: `12500000`
 - MAX_UPLOAD_BYTES      - Max. outgoing traffic in Bytes per Second. Default: `5000000`
 - FRITZBOX_MODEL        - Model of the Fritz!Box being monitored. Default: `7590`
-- FRITZBOX              - IP address of the Fritz!Box being monitored. Container needs to be able to reach this IP. Default: `192.168.1.1`
+- FRITZBOX_IP           - IP address of the Fritz!Box being monitored. Container needs to be able to reach this IP. Default: `192.168.1.1`
 
 ## Volumes:
 
