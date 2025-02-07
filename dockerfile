@@ -1,5 +1,5 @@
 # Base Image
-FROM alpine:latest
+FROM ubuntu:latest
 
 # Set Environment Variable defaults
 ENV PATH=/usr/local/nginx/bin:$PATH
@@ -14,10 +14,12 @@ ENV FRITZBOX_MODEL=7590
 ENV FRITZBOX_IP=192.168.1.1
 
 # Install additional Packages
-RUN apk add --update --no-cache \
+# RUN apk add --update --no-cache \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   bash \
   mrtg \
   nginx \
+  busybox \
   tzdata
 
 # Copy our files to the Container
@@ -43,7 +45,7 @@ RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
 # Fix permission errors
 RUN chmod +x /entrypoint.sh
-RUN chmod +x /fritzbox-mrtg/entrypoint.sh
+RUN chmod +x /fritzbox-mrtg/upnp2mrtg.sh
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
