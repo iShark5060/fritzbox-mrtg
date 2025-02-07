@@ -55,14 +55,14 @@ docker run -d \
 | Variable | Description |
 | ------------- | ------------- |
 | DEBUG  | Run entrypoint script in debug mode. Set to either `0` or `1`. Default: `0` |
-| TZ  | Set a timezone the container should use. Use [this Wikipedia List](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for Values. Default: `Europe/Berlin` |
+| TZ  | Set a timezone the container should use. Use [this Wikipedia List](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for Values. <br>Default: `Europe/Berlin` |
 | POLL_INTERVAL  | Polling interval in seconds. Default: `300` |
 | RUN_WEBSERVER  | Run NGINX Webserver to display output. Set to either `0` or `1`. Default: `1` |
 | USE_DARKMODE  | Set to `1` if you want to use the Darkmode CSS values. Set to either `0` or `1`. Default: `1` |
 | MAX_DOWNLOAD_BYTES  | Max. incoming traffic in Bytes per Second. Default: `12500000` |
 | MAX_UPLOAD_BYTES  | Max. outgoing traffic in Bytes per Second. Default: `5000000` |
 | FRITZBOX_MODEL  | Model of the Fritz!Box being monitored. Default: `7590` |
-| FRITZBOX_IP  | IP address of the Fritz!Box being monitored. Container needs to be able to reach this IP. Default: `192.168.1.1` |
+| FRITZBOX_IP  | IP address of the Fritz!Box being monitored. <br>Container needs to be able to reach this IP. Default: `192.168.1.1` |
 
 ## Volumes:
 
