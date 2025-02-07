@@ -1,5 +1,5 @@
 # Base Image
-FROM ubuntu:24.10
+FROM debian:12-slim
 
 # Set Environment Variable defaults
 ENV PATH=/usr/local/nginx/bin:$PATH
@@ -14,7 +14,6 @@ ENV FRITZBOX_MODEL=7590
 ENV FRITZBOX_IP=192.168.1.1
 
 # Install additional Packages
-# RUN apk add --update --no-cache \
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   bash \
   mrtg \

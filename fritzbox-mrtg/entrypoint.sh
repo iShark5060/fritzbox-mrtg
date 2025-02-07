@@ -25,38 +25,34 @@ setup_timezone() {
     fi
 }
 
-setup_files() {
-	if [ ! -f /srv/www/htdocs/style.css ]; then
-		cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
-	fi
-}
-
+# Stop NGINX Webserver
 stop_nginx() {
     rv=$?
     [ "${RUN_WEBSERVER}" = "1" ] && nginx -s quit
     exit $rv
 }
-
 init_trap() {
     trap stop_nginx TERM INT EXIT
-}
-
-remove_files() {
-	if [ -f /etc/mrtg.cfg ]; then
-		rm /etc/mrtg.cfg
-	fi
-	if [ -f /etc/upnp2mrtg.cfg ]; then
-		rm /etc/upnp2mrtg.cfg
-	fi
 }
 
 # Generic setup
 setup_timezone
 init_trap
-remove_files
-setup_files
 
-# Setup variables
+# Remove old config files
+if [ -f /etc/mrtg.cfg ]; then
+	rm /etc/mrtg.cfg
+fi
+if [ -f /etc/upnp2mrtg.cfg ]; then
+	rm /etc/upnp2mrtg.cfg
+fi
+
+# Copy style files and icons, if missing
+if [ ! -f /srv/www/htdocs/style.css ]; then
+	cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
+fi
+
+# Calculate variables
 DL_KBITS=$((${MAX_DOWNLOAD_BYTES}*8/1000))
 UL_KBITS=$((${MAX_UPLOAD_BYTES}*8/1000))
 
@@ -67,9 +63,9 @@ else
 	CSS="style.css"
 fi
 
-# Replace variables in mrtg config file
+# Replace variables in mrtg config file and copy it to the right place
 if [ ! -f /etc/mrtg.cfg ]; then
-    sed -e "s|7590|${FRITZBOX_MODEL}|g" \
+	sed -e "s|7590|${FRITZBOX_MODEL}|g" \
 	-e "s|172.16.0.1|${FRITZBOX_IP}|g" \
 	-e "s|^MaxBytes1\[fritzbox\]:.*|MaxBytes1\[fritzbox\]: ${MAX_DOWNLOAD_BYTES}|g" \
 	-e "s|250.000|${DL_KBITS}|g" \
@@ -79,13 +75,16 @@ if [ ! -f /etc/mrtg.cfg ]; then
 	/fritzbox-mrtg/mrtg.cfg > /etc/mrtg.cfg
 fi
 
+# Create new upnp2mrtg config file
 if [ ! -f /etc/upnp2mrtg.cfg ]; then
-    echo "HOST=\"${FRITZBOX_IP}\"" > /etc/upnp2mrtg.cfg
-    echo "NETCAT=\"nc\"" >> /etc/upnp2mrtg.cfg
+	echo "HOST=\"${FRITZBOX_IP}\"" > /etc/upnp2mrtg.cfg
+	echo "NETCAT=\"nc\"" >> /etc/upnp2mrtg.cfg
 fi
 
+# Restart NGINX server
 [ "${RUN_WEBSERVER}" = "1" ] && nginx
 
+# Loop to pull new data
 while true; do
   DATE=$(date -Iseconds)
   echo "$DATE Fetch new data"
