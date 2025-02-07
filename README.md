@@ -79,4 +79,14 @@ You can edit the default `style.css` located in the directory configured above t
 
 ## Screenshot
 
-![Screenshot](Screenshot.png)
+![Screenshot](screenshot.png)
+
+## Notice
+
+The logfile will look like this the first time the container is run (or if the files fritzbox.log and fritzbox.old are deleted):
+```
+Rateup WARNING: /usr/bin/rateup could not read the primary log file for fritzbox
+Rateup WARNING: /usr/bin/rateup The backup log file for fritzbox was invalid as well
+Rateup WARNING: /usr/bin/rateup Can't rename fritzbox.log to fritzbox.old updating log file
+```
+This is normal and expected behavior due to how `rateup` handles the file opening. More information in the [MRTG GitHub](https://github.com/oetiker/mrtg/blob/master/src/src/rateup.c#L1328)

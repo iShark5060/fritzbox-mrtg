@@ -1,5 +1,5 @@
 # Base Image
-FROM ubuntu:latest
+FROM ubuntu:24.10
 
 # Set Environment Variable defaults
 ENV PATH=/usr/local/nginx/bin:$PATH
@@ -21,6 +21,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   nginx \
   busybox \
   tzdata
+
+# create netcat symlink
+RUN cd /bin && ln /bin/busybox nc
 
 # Copy our files to the Container
 COPY ./fritzbox-mrtg/entrypoint.sh /
