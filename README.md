@@ -14,6 +14,11 @@ This is my first self-built docker container. Initially I wanted to use the Alpi
 
 The script itself is more or less a direct copy from [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/) with some additions from me.
 
+## Requirements
+
+- Docker, Podman or some other way of running the container
+- Fritz!Box with UPNP enabled (Home Network -> Network -> Transmit status information over UPnP)
+
 ## Running the Container
 
 Docker compose (recommended):

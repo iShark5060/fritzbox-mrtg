@@ -1,6 +1,10 @@
 # Base Image
 FROM debian:12-slim
 
+LABEL author="Lutz Schwemer Panchez"
+LABEL description="Simple, lightweight script that uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth data. It's then sent to mrtg for pretty graphs and finally displayed to a simple website using nginx."
+LABEL version="1.0"
+
 # Set Environment Variable defaults
 ENV PATH=/usr/local/nginx/bin:$PATH
 ENV TZ=Europe/Berlin
