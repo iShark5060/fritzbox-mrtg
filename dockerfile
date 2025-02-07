@@ -18,12 +18,13 @@ ENV FRITZBOX_MODEL=7590
 ENV FRITZBOX_IP=192.168.1.1
 
 # Install additional Packages
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
   bash \
   mrtg \
   nginx \
   busybox \
-  tzdata
+  tzdata \
+  && rm -rf /var/lib/apt/lists/*
 
 # create netcat symlink
 RUN cd /bin && ln /bin/busybox nc
@@ -41,17 +42,16 @@ COPY ./fritzbox-mrtg/default.conf /etc/nginx/http.d/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
 
 # Fix Windows linebreaks
-RUN sed -i -e 's/\r$//' /entrypoint.sh
-RUN sed -i -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh
-RUN sed -i -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg
-RUN sed -i -e 's/\r$//' /etc/nginx/http.d/default.conf
-RUN sed -i -e 's/\r$//' /etc/nginx/nginx.conf
-RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css
-RUN sed -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
+RUN sed -i -e 's/\r$//' /entrypoint.sh \
+-i -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh \
+-i -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg \
+-i -e 's/\r$//' /etc/nginx/http.d/default.conf \
+-i -e 's/\r$//' /etc/nginx/nginx.conf \
+-i -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css \
+-i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
 # Fix permission errors
-RUN chmod +x /entrypoint.sh
-RUN chmod +x /fritzbox-mrtg/upnp2mrtg.sh
+RUN chmod +x /entrypoint.sh && chmod +x /fritzbox-mrtg/upnp2mrtg.sh
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
