@@ -1,12 +1,18 @@
 # Monitor your FRITZ!Box
 
-![Static Badge](https://img.shields.io/badge/Debian-12--slim-red?style=for-the-badge)  ![Debian package](https://img.shields.io/debian/v/mrtg?style=for-the-badge&label=MRTG)  ![Debian package](https://img.shields.io/debian/v/nginx?style=for-the-badge&label=NGINX&color=green)  ![Debian package](https://img.shields.io/debian/v/busybox?style=for-the-badge&label=BusyBox&color=teal)
+![Static Badge](https://img.shields.io/badge/Debian-12--slim-red?style=for-the-badge) ![Debian package](https://img.shields.io/debian/v/busybox?style=for-the-badge&label=BusyBox&color=teal) ![Debian package](https://img.shields.io/debian/v/mrtg?style=for-the-badge&label=MRTG) ![Debian package](https://img.shields.io/debian/v/nginx?style=for-the-badge&label=NGINX&color=green)
 
 Simple, lightweight script that uses `upnp2mrtg` to communicate with your
 Fritz!Box and collect bandwidth data. It's then sent to `mrtg` for pretty
 graphs and finally displayed to a simple website using `nginx`.
 
 The whole project is based on the work of [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/)
+
+## About
+
+This is my first self-built docker container. Initially I wanted to use the Alpine base image, but for some reason the output to the `fritzbox.log` file would be corrupted (the script didn't output the 0 values), so I swapped over to Ubuntu as I was way more familiar with it. After getting everything working, I swapped to Debian because the image is appx. 200MB smaller without compromising any functionality (for this project).
+
+The script itself is more or less a direct copy from [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/) with some additions from me.
 
 ## Running the Container
 
