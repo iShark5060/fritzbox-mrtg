@@ -15,15 +15,15 @@ services:
     image: shark5060/fritzbox-mrtg:latest
     container_name: fritzbox-mrtg
     environment:
-	  - TZ=Europe/Berlin
-	  - DEBUG=0
-	  - RUN_WEBSERVER=1
-	  - USE_DARKMODE=1
-	  - POLL_INTERVAL=300
-	  - MAX_DOWNLOAD_BYTES=12500000
-	  - MAX_UPLOAD_BYTES=5000000
-	  - FRITZBOX_MODEL=7590
-	  - FRITZBOX_IP=192.168.1.1
+      - TZ=Europe/Berlin
+      - DEBUG=0
+      - RUN_WEBSERVER=1
+      - USE_DARKMODE=1
+      - POLL_INTERVAL=300
+      - MAX_DOWNLOAD_BYTES=12500000
+      - MAX_UPLOAD_BYTES=5000000
+      - FRITZBOX_MODEL=7590
+      - FRITZBOX_IP=192.168.1.1
     volumes:
       - /path/to/config:/srv/www/htdocs
     ports:
