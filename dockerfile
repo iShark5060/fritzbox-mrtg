@@ -5,6 +5,10 @@ LABEL author="Lutz Schwemer Panchez"
 LABEL description="Simple, lightweight script that uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth data. It's then sent to mrtg for pretty graphs and finally displayed to a simple website using nginx."
 LABEL version="1.1"
 
+LABEL org.opencontainers.image.source=https://github.com/ishark5060/fritzbox-mrtg
+LABEL org.opencontainers.image.description="Simple, lightweight script that uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth data. It's then sent to mrtg for pretty graphs and finally displayed to a simple website using nginx."
+LABEL org.opencontainers.image.licenses=MIT
+
 # Set Environment Variable defaults
 ENV PATH=/usr/local/nginx/bin:$PATH
 ENV TZ=Europe/Berlin
