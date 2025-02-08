@@ -48,7 +48,7 @@ if [ -f /etc/upnp2mrtg.cfg ]; then
 fi
 
 # Copy style files and icons, if missing
-if [ ! -f /srv/www/htdocs/style.css ]; then
+if [ ! -f /srv/www/htdocs/style.css ] || [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
 	cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
 fi
 
