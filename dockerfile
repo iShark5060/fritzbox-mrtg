@@ -20,6 +20,7 @@ ENV MAX_DOWNLOAD_BYTES=12500000
 ENV MAX_UPLOAD_BYTES=5000000
 ENV FRITZBOX_MODEL=7590
 ENV FRITZBOX_IP=192.168.1.1
+ENV USE_SSL=0
 
 # Install additional Packages
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
@@ -43,6 +44,8 @@ COPY ./fritzbox-mrtg/mrtg-l.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-m.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-r.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/default.conf /etc/nginx/http.d/
+COPY ./fritzbox-mrtg/default.conf /fritzbox-mrtg/
+COPY ./fritzbox-mrtg/default_ssl.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
 
 # Fix Windows linebreaks
@@ -50,6 +53,8 @@ RUN sed -i -e 's/\r$//' /entrypoint.sh \
 -i -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh \
 -i -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg \
 -i -e 's/\r$//' /etc/nginx/http.d/default.conf \
+-i -e 's/\r$//' /fritzbox-mrtg/default.conf \
+-i -e 's/\r$//' /fritzbox-mrtg/default_ssl.conf \
 -i -e 's/\r$//' /etc/nginx/nginx.conf \
 -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css \
 -i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css

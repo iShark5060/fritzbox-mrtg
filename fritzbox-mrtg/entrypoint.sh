@@ -12,6 +12,7 @@ MAX_DOWNLOAD_BYTES=${MAX_DOWNLOAD_BYTES:-12500000}
 MAX_UPLOAD_BYTES=${MAX_UPLOAD_BYTES:-5000000}
 FRITZBOX_MODEL=${FRITZBOX_MODEL:-7590}
 FRITZBOX_IP=${FRITZBOX_IP:-192.168.1.1}
+USE_SSL=${USE_SSL:-0}
 
 setup_timezone() {
     if [ -n "$TZ" ]; then
@@ -50,6 +51,13 @@ fi
 # Copy style files and icons, if missing
 if [ ! -f /srv/www/htdocs/style.css ] || [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
 	cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
+fi
+
+# Copy HTTP or HTTPS Server Config
+if [ "${USE_SSL}" = "1" ]; then
+	cp /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
+else
+	cp /fritzbox-mrtg/default.conf /etc/nginx/http.d/default.conf
 fi
 
 # Calculate variables

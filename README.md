@@ -78,6 +78,20 @@ All binary variables use either `1` or `0` as value.
 | MAX_UPLOAD_BYTES  | Max. outgoing traffic in Bytes per Second. | `5000000` |
 | FRITZBOX_MODEL  | Model of the Fritz!Box being monitored. | `7590` |
 | FRITZBOX_IP  | IP address of the Fritz!Box being monitored. <br>Container needs to be able to reach this IP. | `192.168.1.1` |
+| USE_SSL  | Set to `1` to sse SSL Certificate and run HTTPS server instead of HTTP server. Port changes from :80 to :443 as well. See below. | `0` |
+
+## SSL Certificate
+
+To use an SSL certificate and run an HTTPS server instead of an HTTP one, you have to have a valid SSL certificate already.
+NGINX will run on Port 443 instead of 80 internally, so you need to change the binding as well as provide a path for the SSL certificate.
+
+First you have to mount the directory `/usr/local/nginx/ssl-cert/` to one containing the SSL certificate (named `cert.pem`) and the Private Key (named `cert.key`)
+```
+volumes:
+      - /path/to/ssl/cert:/usr/local/nginx/ssl-cert
+```
+then you have to set the `USE_SSL` environment variable to `1` and finally change the Port config from `3000:80` to `3000:443` (or use whatever host port you'd like obviously).
+finally access the container via `https://your.domain.tld:3000`.
 
 ## Volumes:
 
@@ -85,6 +99,9 @@ All binary variables use either `1` or `0` as value.
 Output directory for both the historical data (stored in `fritzbox.log`) as well as the generated images/website.
 Point this to a directory writeable by the docker user or the user set in the compose/run command.
 If unset, data will not be persistent.
+
+`/path/to/ssl/cert:/usr/local/nginx/ssl-cert`
+Optional directory for using an SSL certificate. Please see the section about SSL Certificate in the readme.
 
 ## Output
 
