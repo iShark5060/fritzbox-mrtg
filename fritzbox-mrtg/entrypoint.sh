@@ -67,7 +67,6 @@ mkdir -p /srv/www/htdocs/icons
 if [ ! -f /srv/www/htdocs/style.css ] || \
    [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
   cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
-	ln -s /srv/www/htdocs/icons /srv/www/htdocs/cgi-bin/icons
 fi
 
 if [ "${USE_SSL}" = "1" ]; then

@@ -55,6 +55,9 @@ COPY ./fritzbox-mrtg/style_light.css /fritzbox-mrtg/htdocs/
 COPY ./fritzbox-mrtg/mrtg-l.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-m.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-r.png /fritzbox-mrtg/htdocs/icons/
+COPY ./fritzbox-mrtg/mrtg-l.gif /fritzbox-mrtg/htdocs/icons/
+COPY ./fritzbox-mrtg/mrtg-m.gif /fritzbox-mrtg/htdocs/icons/
+COPY ./fritzbox-mrtg/mrtg-r.gif /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/default.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/default_ssl.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
