@@ -67,6 +67,7 @@ mkdir -p /srv/www/htdocs/icons
 if [ ! -f /srv/www/htdocs/style.css ] || \
    [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
   cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
+	ln -s /srv/www/htdocs/icons /srv/www/htdocs/cgi-bin/icons
 fi
 
 if [ "${USE_SSL}" = "1" ]; then
@@ -110,6 +111,7 @@ fi
 
 if [ ! -f /srv/www/htdocs/index.html ]; then
   indexmaker --rrdviewer='/cgi-bin/14all.cgi' /etc/mrtg.cfg > /srv/www/htdocs/index.html || true
+	sed -i 's#</HEAD>#  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
 fi
 
 while true; do

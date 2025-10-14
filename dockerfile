@@ -81,8 +81,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 80 443
 VOLUME ["/srv/www/htdocs"]
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -fsS http://127.0.0.1/ >/dev/null || exit 1
+SHELL ["/bin/sh", "-c"]
 
 # Default parameter to run
 CMD [""]

@@ -4,7 +4,7 @@ LogFormat: rrdtool
 Interval: ${INTERVAL_MIN}
 Target[fritzbox]: `/fritzbox-mrtg/upnp2mrtg.sh`
 Title[fritzbox]: Traffic Analysis for FRITZ!Box ${FRITZBOX_MODEL}
-AddHead[fritzbox]: <link rel="stylesheet" type="text/css" href="${CSS}">
+AddHead[fritzbox]: <link rel="stylesheet" type="text/css" href="/${CSS}">
 Options[fritzbox]: transparent, noborder, unknaszero
 
 MaxBytes1[fritzbox]: ${MAX_DOWNLOAD_BYTES}

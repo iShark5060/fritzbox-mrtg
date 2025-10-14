@@ -69,9 +69,9 @@ my (@author, @style);
 my $cfgfiledir = '';
 
 ### customize the html pages
-#@author = ( -author => 'bawidama@users.sourceforge.net');
+@author = ( -author => 'shark@shark5060.net');
 # one possibility to enable stylesheets (second is to use "AddHead[_]:..." in mrtg.cfg)
-#@style = ( -style => { -src => 'general.css' });
+# @style = ( -style => { -src => '/style.css' });
 ###
 
 # static data
