@@ -1,16 +1,21 @@
 # Base Image
-FROM debian:stable-slim
+FROM alpine:latest
 
 LABEL author="Lutz Schwemer Panchez"
-LABEL description="Simple, lightweight script that uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth data. It's then sent to mrtg for pretty graphs and finally displayed to a simple website using nginx."
-LABEL version="1.1"
+LABEL description="Simple, lightweight script that uses upnp2mrtg to \
+communicate with your Fritz!Box and collect bandwidth data. It's then sent \
+to mrtg for pretty graphs and finally displayed to a simple website using \
+nginx."
+LABEL version="1.2"
 
 LABEL org.opencontainers.image.source=https://github.com/ishark5060/fritzbox-mrtg
-LABEL org.opencontainers.image.description="Simple, lightweight script that uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth data. It's then sent to mrtg for pretty graphs and finally displayed to a simple website using nginx."
+LABEL org.opencontainers.image.description="Simple, lightweight script that \
+uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth \
+data. It's then sent to mrtg for pretty graphs and finally displayed to a \
+simple website using nginx."
 LABEL org.opencontainers.image.licenses=MIT
 
 # Set Environment Variable defaults
-ENV PATH=/usr/local/nginx/bin:$PATH
 ENV TZ=Europe/Berlin
 ENV DEBUG=0
 ENV RUN_WEBSERVER=1
@@ -22,52 +27,62 @@ ENV FRITZBOX_MODEL=7590
 ENV FRITZBOX_IP=192.168.1.1
 ENV USE_SSL=0
 
-# Install additional Packages
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
-  bash \
-  mrtg \
+# Install packages
+RUN apk add --no-cache \
   nginx \
-  busybox \
+  mrtg \
+  perl \
+  perl-cgi \
+  rrdtool \
+  perl-rrd \
+  fcgiwrap \
+  spawn-fcgi \
+  curl \
   tzdata \
-  && rm -rf /var/lib/apt/lists/*
-
-# create netcat symlink
-RUN cd /bin && ln /bin/busybox nc
+  ca-certificates \
+  gettext \
+  netcat-openbsd \
+  bash \
+  fontconfig \
+  ttf-dejavu
 
 # Copy our files to the Container
 COPY ./fritzbox-mrtg/entrypoint.sh /
-COPY ./fritzbox-mrtg/mrtg.cfg /fritzbox-mrtg/
+COPY ./fritzbox-mrtg/mrtg.cfg.tmpl /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/upnp2mrtg.sh /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/style.css /fritzbox-mrtg/htdocs/
 COPY ./fritzbox-mrtg/style_light.css /fritzbox-mrtg/htdocs/
 COPY ./fritzbox-mrtg/mrtg-l.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-m.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-r.png /fritzbox-mrtg/htdocs/icons/
-COPY ./fritzbox-mrtg/default.conf /etc/nginx/http.d/
 COPY ./fritzbox-mrtg/default.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/default_ssl.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
+COPY ./fritzbox-mrtg/cgi-bin/14all.cgi /srv/www/cgi-bin/14all.cgi
 
 # Fix Windows linebreaks
 RUN sed -i -e 's/\r$//' /entrypoint.sh \
--i -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh \
--i -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg \
--i -e 's/\r$//' /etc/nginx/http.d/default.conf \
--i -e 's/\r$//' /fritzbox-mrtg/default.conf \
--i -e 's/\r$//' /fritzbox-mrtg/default_ssl.conf \
--i -e 's/\r$//' /etc/nginx/nginx.conf \
--i -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css \
--i -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
+  -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh \
+  -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg.tmpl \
+  -e 's/\r$//' /fritzbox-mrtg/default.conf \
+  -e 's/\r$//' /fritzbox-mrtg/default_ssl.conf \
+  -e 's/\r$//' /etc/nginx/nginx.conf \
+  -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css \
+  -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
 # Fix permission errors
-RUN chmod +x /entrypoint.sh && chmod +x /fritzbox-mrtg/upnp2mrtg.sh
+RUN chmod +x /entrypoint.sh /fritzbox-mrtg/upnp2mrtg.sh
+RUN chmod 0755 /srv/www/cgi-bin/14all.cgi
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Ports & Volumes
-EXPOSE 80
+EXPOSE 80 443
 VOLUME ["/srv/www/htdocs"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1/ >/dev/null || exit 1
 
 # Default parameter to run
 CMD [""]

@@ -1,6 +1,6 @@
 #!/bin/sh
-
-[ "${DEBUG}" = "1" ] && set -x
+set -Eeuo pipefail
+[ "${DEBUG:-0}" = "1" ] && set -x
 
 export PATH=/usr/sbin:/sbin:${PATH}
 export LANG=C
@@ -14,88 +14,106 @@ FRITZBOX_MODEL=${FRITZBOX_MODEL:-7590}
 FRITZBOX_IP=${FRITZBOX_IP:-192.168.1.1}
 USE_SSL=${USE_SSL:-0}
 
+INTERVAL_MIN=$((POLL_INTERVAL / 60))
+
+log() {
+  printf "%s %s\n" "$(date -Is)" "$*"
+}
+
 setup_timezone() {
-    if [ -n "$TZ" ]; then
-		TZ_FILE="/usr/share/zoneinfo/$TZ"
-		if [ -f "$TZ_FILE" ]; then
-			echo "Setting container timezone to: $TZ"
-			ln -snf "$TZ_FILE" /etc/localtime
-		else
-			echo "Cannot set timezone \"$TZ\": timezone does not exist."
-		fi
+  if [ -n "${TZ:-}" ]; then
+    TZ_FILE="/usr/share/zoneinfo/$TZ"
+    if [ -f "$TZ_FILE" ]; then
+      ln -snf "$TZ_FILE" /etc/localtime
+      echo "$TZ" >/etc/timezone || true
+      log "Timezone set to: $TZ"
+    else
+      log "Cannot set timezone \"$TZ\": timezone not found"
     fi
+  fi
 }
 
-# Stop NGINX Webserver
-stop_nginx() {
-    rv=$?
-    [ "${RUN_WEBSERVER}" = "1" ] && nginx -s quit
-    exit $rv
+cleanup() {
+  rv=$?
+  if [ "${RUN_WEBSERVER}" = "1" ] && pidof nginx >/dev/null 2>&1; then
+    nginx -s quit || true
+  fi
+  exit $rv
 }
-init_trap() {
-    trap stop_nginx TERM INT EXIT
+trap cleanup TERM INT EXIT
+
+# Cross-platform timeout wrapper for commands
+run_with_timeout() {
+  if timeout 0.1s true >/dev/null 2>&1; then
+    timeout "$@"; return $?
+  fi
+  if timeout 1 true >/dev/null 2>&1; then
+    local first="$1"; shift
+    first="${first%s}"
+    timeout "$first" "$@"; return $?
+  fi
+  if timeout -t 1 true >/dev/null 2>&1; then
+    local first="$1"; shift
+    first="${first%s}"
+    timeout -t "$first" "$@"; return $?
+  fi
+  "$@"
 }
 
-# Generic setup
 setup_timezone
-init_trap
 
-# Remove old config files
-if [ -f /etc/mrtg.cfg ]; then
-	rm /etc/mrtg.cfg
-fi
-if [ -f /etc/upnp2mrtg.cfg ]; then
-	rm /etc/upnp2mrtg.cfg
+mkdir -p /run/nginx /etc/nginx/http.d
+mkdir -p /srv/www/htdocs/icons
+if [ ! -f /srv/www/htdocs/style.css ] || \
+   [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
+  cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
 fi
 
-# Copy style files and icons, if missing
-if [ ! -f /srv/www/htdocs/style.css ] || [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
-	cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
-fi
-
-# Copy HTTP or HTTPS Server Config
 if [ "${USE_SSL}" = "1" ]; then
-	cp /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
+  cp /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
 else
-	cp /fritzbox-mrtg/default.conf /etc/nginx/http.d/default.conf
+  cp /fritzbox-mrtg/default.conf /etc/nginx/http.d/default.conf
 fi
 
-# Calculate variables
-DL_KBITS=$((${MAX_DOWNLOAD_BYTES}*8/1000))
-UL_KBITS=$((${MAX_UPLOAD_BYTES}*8/1000))
+DL_KBITS=$((MAX_DOWNLOAD_BYTES * 8 / 1000))
+UL_KBITS=$((MAX_UPLOAD_BYTES * 8 / 1000))
 
-# Darkmode?
 if [ "${USE_DARKMODE}" = "0" ]; then
-	CSS="style_light.css"
+  CSS="style_light.css"
 else
-	CSS="style.css"
+  CSS="style.css"
 fi
 
-# Replace variables in mrtg config file and copy it to the right place
 if [ ! -f /etc/mrtg.cfg ]; then
-	sed -e "s|7590|${FRITZBOX_MODEL}|g" \
-	-e "s|172.16.0.1|${FRITZBOX_IP}|g" \
-	-e "s|^MaxBytes1\[fritzbox\]:.*|MaxBytes1\[fritzbox\]: ${MAX_DOWNLOAD_BYTES}|g" \
-	-e "s|250.000|${DL_KBITS}|g" \
-	-e "s|^MaxBytes2\[fritzbox\]:.*|MaxBytes2\[fritzbox\]: ${MAX_UPLOAD_BYTES}|g" \
-	-e "s|40.000|${UL_KBITS}|g" \
-	-e "s|^AddHead\[fritzbox\]:.*|AddHead\[fritzbox\]: <link rel=\"stylesheet\" type=\"text/css\" href=\"${CSS}\">|g" \
-	/fritzbox-mrtg/mrtg.cfg > /etc/mrtg.cfg
+  export FRITZBOX_MODEL FRITZBOX_IP MAX_DOWNLOAD_BYTES MAX_UPLOAD_BYTES
+  export DL_KBITS UL_KBITS CSS INTERVAL_MIN
+  envsubst '
+    ${FRITZBOX_MODEL}
+    ${FRITZBOX_IP}
+    ${MAX_DOWNLOAD_BYTES}
+    ${MAX_UPLOAD_BYTES}
+    ${DL_KBITS}
+    ${UL_KBITS}
+    ${CSS}
+		${INTERVAL_MIN}
+  ' < /fritzbox-mrtg/mrtg.cfg.tmpl > /etc/mrtg.cfg
 fi
 
-# Create new upnp2mrtg config file
-if [ ! -f /etc/upnp2mrtg.cfg ]; then
-	echo "HOST=\"${FRITZBOX_IP}\"" > /etc/upnp2mrtg.cfg
-	echo "NETCAT=\"nc\"" >> /etc/upnp2mrtg.cfg
+printf 'HOST="%s"\nNETCAT="nc"\n' "${FRITZBOX_IP}" > /etc/upnp2mrtg.cfg
+
+mkdir -p /run
+spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u nginx -g nginx /usr/bin/fcgiwrap
+
+if [ "${RUN_WEBSERVER}" = "1" ]; then
+  nginx
 fi
 
-# Restart NGINX server
-[ "${RUN_WEBSERVER}" = "1" ] && nginx
+if [ ! -f /srv/www/htdocs/index.html ]; then
+  indexmaker --rrdviewer='/cgi-bin/14all.cgi' /etc/mrtg.cfg > /srv/www/htdocs/index.html || true
+fi
 
-# Loop to pull new data
 while true; do
-  DATE=$(date -Iseconds)
-  echo "$DATE Fetch new data"
-  /usr/bin/mrtg /etc/mrtg.cfg
+  log "Fetch new data"
+  run_with_timeout 15 /usr/bin/mrtg /etc/mrtg.cfg || log "mrtg run failed"
   sleep "${POLL_INTERVAL}"
 done

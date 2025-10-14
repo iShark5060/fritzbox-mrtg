@@ -85,10 +85,10 @@ All binary variables use either `1` or `0` as value.
 To use an SSL certificate and run an HTTPS server instead of an HTTP one, you have to have a valid SSL certificate already.
 NGINX will run on Port 443 instead of 80 internally, so you need to change the binding as well as provide a path for the SSL certificate.
 
-1) Mount the directory `/usr/local/nginx/ssl-cert/` to one containing the SSL certificate (named `cert.pem`) and the Private Key (named `cert.key`).
+1) Mount the directory `/etc/nginx/ssl/` to one containing the SSL certificate (named `cert.pem`) and the Private Key (named `cert.key`).
 ```
 volumes:
-      - /path/to/ssl/cert:/usr/local/nginx/ssl-cert
+      - /path/to/ssl/cert:/etc/nginx/ssl/
 ```
 2) Set the `USE_SSL` environment variable to `1`.
 3) Change the Port config from `3000:80` to `3000:443` (or use whatever host port you'd like obviously).
@@ -101,7 +101,7 @@ Output directory for both the historical data (stored in `fritzbox.log`) as well
 Point this to a directory writeable by the docker user or the user set in the compose/run command.
 If unset, data will not be persistent.
 
-`/path/to/ssl/cert:/usr/local/nginx/ssl-cert`
+`/path/to/ssl/cert:/etc/nginx/ssl/`
 Optional directory for using an SSL certificate. Please see the section about SSL Certificate in the readme.
 
 ## Output
