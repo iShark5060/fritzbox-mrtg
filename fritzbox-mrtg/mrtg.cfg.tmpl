@@ -2,15 +2,23 @@ WorkDir: /srv/www/htdocs
 IconDir: /icons/
 LogFormat: rrdtool
 Interval: ${INTERVAL_MIN}
+
 Target[fritzbox]: `/fritzbox-mrtg/upnp2mrtg.sh`
 Title[fritzbox]: Traffic Analysis for FRITZ!Box ${FRITZBOX_MODEL}
-AddHead[fritzbox]: <link rel="stylesheet" type="text/css" href="/${CSS}">
+AddHead[fritzbox]: <link rel="stylesheet" type="text/css" href="${CSS}">
 Options[fritzbox]: transparent, noborder, unknaszero
+Colours[fritzbox]: ${COL_IN},${COL_OUT},${COL_MAXIN},${COL_MAXOUT}
+
+14all*Background: ${PAGE_BG}
+
+14all*GridColor: ${GRID_COLOR}
+14all*MGridColor: ${MGRID_COLOR}
+14all*BackColor: ${BACK_COLOR}
+14all*CanvasColor: ${CANVAS_COLOR}
 
 MaxBytes1[fritzbox]: ${MAX_DOWNLOAD_BYTES}
 MaxBytes2[fritzbox]: ${MAX_UPLOAD_BYTES}
 
-Colours[fritzbox]: GREEN#00eb0c,BLUE#1000ff,DARK GREEN#006600,VIOLET#ff00ff
 Unscaled[fritzbox]: dwmy
 XSize[fritzbox]: 600
 YSize[fritzbox]: 200
@@ -20,25 +28,10 @@ Options[_]: growright
 PageTop[fritzbox]: <h1>Traffic Analysis for FRITZ!Box ${FRITZBOX_MODEL}</h1>
   <div id="sysdetails">
     <table>
-      <tr>
-        <td>System:</td>
-        <td>FRITZ!Box ${FRITZBOX_MODEL}</td>
-      </tr>
-      <tr>
-        <td>IP Address:</td>
-        <td>${FRITZBOX_IP}</td>
-      </tr>
-      <tr>
-        <td>Description:</td>
-        <td>DSL</td>
-      </tr>
-      <tr>
-        <td>Max Download Speed:</td>
-        <td>${DL_KBITS} kBit/s</td>
-      </tr>
-      <tr>
-        <td>Max Upload Speed:</td>
-        <td>${UL_KBITS} kBit/s</td>
-      </tr>
+      <tr><td>System:</td><td>FRITZ!Box ${FRITZBOX_MODEL}</td></tr>
+      <tr><td>IP Address:</td><td>${FRITZBOX_IP}</td></tr>
+      <tr><td>Description:</td><td>DSL</td></tr>
+      <tr><td>Max Download Speed:</td><td>${DL_KBITS} kBit/s</td></tr>
+      <tr><td>Max Upload Speed:</td><td>${UL_KBITS} kBit/s</td></tr>
     </table>
   </div>

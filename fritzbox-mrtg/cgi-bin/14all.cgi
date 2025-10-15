@@ -95,6 +95,10 @@ my %myrules = (
     [sub{$_[0] =~ m/^\d+[,\s]+\d+$/o}, sub{"14all*indexgraphsize: need two numbers"}],
   '14all*maxrules[]' => [sub{1}, sub{"Internal Error"}],
   '14all*stackgraph[]' => [sub{1}, sub{"Internal Error"}],
+  '14all*gridcolor'   => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*GridColor not in form '#xxxxxx'"}],
+  '14all*mgridcolor'  => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*MGridColor not in form '#xxxxxx'"}],
+  '14all*backcolor'   => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*BackColor not in form '#xxxxxx'"}],
+  '14all*canvascolor' => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*CanvasColor not in form '#xxxxxx'"}],
 );
 
 my %graphparams = (
@@ -389,8 +393,15 @@ sub set_graph_params($$$$) {
   } elsif (yesorno($cfg->{targets}{'14all*logarithmic'}{$log})) {
     push @args, '-o';
   }
-  push @args,'--alt-y-mrtg','--lazy','-c','MGRID#ee0000','-c','GRID#000000';
-  # contributed by Henry Chen: option to stack the two values
+  my $grid  = $cfg->{config}{'14all*gridcolor'}   || '#000000';
+  my $mgrid = $cfg->{config}{'14all*mgridcolor'}  || '#ee0000';
+  my $back  = $cfg->{config}{'14all*backcolor'}   || '';
+  my $canvas= $cfg->{config}{'14all*canvascolor'} || '';
+  push @args, '--alt-y-mrtg', '--lazy',
+    '-c', "MGRID$mgrid",
+    '-c', "GRID$grid";
+  push @args, '-c', "BACK$back"   if $back;
+  push @args, '-c', "CANVAS$canvas" if $canvas;
   # set the mode of the second line from config
   my $line2 = 'LINE1:';
   if (yesorno($cfg->{targets}{'14all*stackgraph'}{$log})) {
