@@ -1,6 +1,6 @@
 # Monitor your FRITZ!Box
 
-![Static Badge](https://img.shields.io/badge/Debian-stable--slim-red?style=for-the-badge) ![Debian package](https://img.shields.io/debian/v/busybox?style=for-the-badge&label=BusyBox&color=teal) ![Debian package](https://img.shields.io/debian/v/mrtg?style=for-the-badge&label=MRTG) ![Debian package](https://img.shields.io/debian/v/nginx?style=for-the-badge&label=NGINX&color=green)
+![Static Badge](https://img.shields.io/badge/Alpine-latest-red?style=for-the-badge) ![Static Badge](https://img.shields.io/badge/APK-green?style=for-the-badge&label=RRDtool) ![Static Badge](https://img.shields.io/badge/APK-blue?style=for-the-badge&label=MRTG) ![Static Badge](https://img.shields.io/badge/APK-yellow?style=for-the-badge&label=NGINX)
 
 Simple, lightweight script that uses `upnp2mrtg` to communicate with your
 Fritz!Box and collect bandwidth data. It's then sent to `mrtg` for pretty
