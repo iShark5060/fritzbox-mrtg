@@ -90,6 +90,7 @@ if [ "${USE_DARKMODE}" = "1" ]; then
   MGRID_COLOR="#666666"
   BACK_COLOR="#202020"
   CANVAS_COLOR="#282828"
+	FONT_COLOR="#ffffff"
 else
   CSS="style_light.css"
   COL_IN="GREEN#00a50c"
@@ -102,6 +103,7 @@ else
   MGRID_COLOR="#999999"
   BACK_COLOR="#ffffff"
   CANVAS_COLOR="#f7f7f7"
+	FONT_COLOR="#000000"
 fi
 
 export COL_IN COL_OUT COL_MAXIN COL_MAXOUT
@@ -111,7 +113,7 @@ if [ ! -f /etc/mrtg.cfg ]; then
   export FRITZBOX_MODEL FRITZBOX_IP MAX_DOWNLOAD_BYTES MAX_UPLOAD_BYTES
   export DL_KBITS UL_KBITS CSS INTERVAL_MIN
   export COL_IN COL_OUT COL_MAXIN COL_MAXOUT
-  export PAGE_BG GRID_COLOR MGRID_COLOR BACK_COLOR CANVAS_COLOR
+  export PAGE_BG GRID_COLOR MGRID_COLOR BACK_COLOR CANVAS_COLOR FONT_COLOR
 
   envsubst '
     ${FRITZBOX_MODEL}
@@ -131,6 +133,7 @@ if [ ! -f /etc/mrtg.cfg ]; then
     ${MGRID_COLOR}
     ${BACK_COLOR}
     ${CANVAS_COLOR}
+		${FONT_COLOR}
   ' < /fritzbox-mrtg/mrtg.cfg.tmpl > /etc/mrtg.cfg
 fi
 

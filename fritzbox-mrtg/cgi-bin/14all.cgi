@@ -393,15 +393,17 @@ sub set_graph_params($$$$) {
   } elsif (yesorno($cfg->{targets}{'14all*logarithmic'}{$log})) {
     push @args, '-o';
   }
-  my $grid  = $cfg->{config}{'14all*gridcolor'}   || '#000000';
+  my $grid = $cfg->{config}{'14all*gridcolor'}   || '#000000';
+	my $font = $cfg->{config}{'14all*fontcolor'}   || '#000000';
   my $mgrid = $cfg->{config}{'14all*mgridcolor'}  || '#ee0000';
   my $back  = $cfg->{config}{'14all*backcolor'}   || '';
   my $canvas= $cfg->{config}{'14all*canvascolor'} || '';
-  push @args, '--alt-y-mrtg', '--lazy',
+  push @args, '--alt-y-mrtg', '--lazy', "--border 0",
     '-c', "MGRID$mgrid",
     '-c', "GRID$grid";
-  push @args, '-c', "BACK$back"   if $back;
+  push @args, '-c', "BACK$back" if $back;
   push @args, '-c', "CANVAS$canvas" if $canvas;
+	push @args, '-c', "FONT$font" if $font;
   # set the mode of the second line from config
   my $line2 = 'LINE1:';
   if (yesorno($cfg->{targets}{'14all*stackgraph'}{$log})) {
