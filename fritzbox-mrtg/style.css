@@ -42,7 +42,7 @@ p {
   padding: 10px;
 }
 
-body img {
+body > img {
   width: 600px;
   margin-left: 50px;
   background-color: rgb(40, 40, 40);
