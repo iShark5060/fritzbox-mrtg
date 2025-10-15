@@ -59,9 +59,11 @@ COPY ./fritzbox-mrtg/default.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/default_ssl.conf /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/nginx.conf /etc/nginx/
 COPY ./fritzbox-mrtg/cgi-bin/14all.cgi /srv/www/cgi-bin/14all.cgi
+COPY ./fritzbox-mrtg/healthcheck.sh /usr/local/bin/healthcheck.sh
 
 # Fix Windows linebreaks
 RUN sed -i -e 's/\r$//' /entrypoint.sh \
+  -e 's/\r$//' /usr/local/bin/healthcheck.sh \
   -e 's/\r$//' /fritzbox-mrtg/upnp2mrtg.sh \
   -e 's/\r$//' /fritzbox-mrtg/mrtg.cfg.tmpl \
   -e 's/\r$//' /fritzbox-mrtg/default.conf \
@@ -74,6 +76,8 @@ RUN sed -i -e 's/\r$//' /entrypoint.sh \
 RUN chmod +x /entrypoint.sh /fritzbox-mrtg/upnp2mrtg.sh
 RUN chmod 0755 /srv/www/cgi-bin/14all.cgi
 
+RUN chmod +x /usr/local/bin/healthcheck.sh
+
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
 
@@ -82,6 +86,11 @@ EXPOSE 80 443
 VOLUME ["/srv/www/htdocs"]
 
 SHELL ["/bin/sh", "-c"]
+
+# Healthcheck (tune start-period to your POLL_INTERVAL)
+# For POLL_INTERVAL=300s (5m), two cycles ≈ 10m; add buffer => 12m
+HEALTHCHECK --interval=60s --timeout=10s --start-period=12m --retries=3 \
+  CMD /usr/local/bin/healthcheck.sh
 
 # Default parameter to run
 CMD [""]
