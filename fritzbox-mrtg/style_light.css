@@ -2,7 +2,7 @@ body {
   background-color: rgb(230, 230, 230);
   color: rgba(0, 0, 0, 0.85);
   scrollbar-color: rgba(255, 255, 255, 0.28) rgb(166, 166, 166);
-    scrollbar-width: auto;
+  scrollbar-width: auto;
 }
 
 h1 {

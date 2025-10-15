@@ -78,13 +78,8 @@ fi
 DL_KBITS=$((MAX_DOWNLOAD_BYTES * 8 / 1000))
 UL_KBITS=$((MAX_UPLOAD_BYTES * 8 / 1000))
 
-if [ "${USE_DARKMODE}" = "0" ]; then
-  CSS="style_light.css"
-else
-  CSS="style.css"
-fi
-
 if [ "${USE_DARKMODE}" = "1" ]; then
+  CSS="style.css"
   COL_IN="GREEN#00eb0c"
   COL_OUT="BLUE#10a0ff"
   COL_MAXIN="DARK GREEN#006600"
@@ -96,6 +91,7 @@ if [ "${USE_DARKMODE}" = "1" ]; then
   BACK_COLOR="#202020"
   CANVAS_COLOR="#282828"
 else
+  CSS="style_light.css"
   COL_IN="GREEN#00a50c"
   COL_OUT="BLUE#0060ff"
   COL_MAXIN="DARK GREEN#006600"
