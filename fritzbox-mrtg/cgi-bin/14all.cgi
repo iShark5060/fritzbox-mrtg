@@ -99,6 +99,9 @@ my %myrules = (
   '14all*mgridcolor'  => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*MGridColor not in form '#xxxxxx'"}],
   '14all*backcolor'   => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*BackColor not in form '#xxxxxx'"}],
   '14all*canvascolor' => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*CanvasColor not in form '#xxxxxx'"}],
+  '14all*fontcolor'    => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*FontColor not in form '#rrggbb'"}],
+  '14all*axiscolor'    => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*AxisColor not in form '#rrggbb'"}],
+  '14all*framecolor'   => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*FrameColor not in form '#rrggbb'"}],
 );
 
 my %graphparams = (
@@ -393,17 +396,24 @@ sub set_graph_params($$$$) {
   } elsif (yesorno($cfg->{targets}{'14all*logarithmic'}{$log})) {
     push @args, '-o';
   }
-  my $grid = $cfg->{config}{'14all*gridcolor'}   || '#000000';
-	my $font = $cfg->{config}{'14all*fontcolor'}   || '#000000';
-  my $mgrid = $cfg->{config}{'14all*mgridcolor'}  || '#ee0000';
-  my $back  = $cfg->{config}{'14all*backcolor'}   || '';
-  my $canvas= $cfg->{config}{'14all*canvascolor'} || '';
-  push @args, '--alt-y-mrtg', '--lazy', "--border 0",
+  my $grid   = $cfg->{config}{'14all*gridcolor'}    || '#000000';
+  my $mgrid  = $cfg->{config}{'14all*mgridcolor'}   || '#ee0000';
+  my $back   = $cfg->{config}{'14all*backcolor'}    || '';
+  my $canvas = $cfg->{config}{'14all*canvascolor'}  || '';
+  my $fcol   = $cfg->{config}{'14all*fontcolor'}    || '';
+  my $acol   = $cfg->{config}{'14all*axiscolor'}    || '';
+  my $frcol  = $cfg->{config}{'14all*framecolor'}   || '';
+
+  push @args, '--alt-y-mrtg', '--lazy',
     '-c', "MGRID$mgrid",
     '-c', "GRID$grid";
-  push @args, '-c', "BACK$back" if $back;
+
+  push @args, '-c', "BACK$back"     if $back;
   push @args, '-c', "CANVAS$canvas" if $canvas;
-	push @args, '-c', "FONT$font" if $font;
+  push @args, '-c', "FONT$fcol"     if $fcol;
+  push @args, '-c', "AXIS$acol"     if $acol;
+  push @args, '-c', "FRAME$frcol"   if $frcol;
+
   # set the mode of the second line from config
   my $line2 = 'LINE1:';
   if (yesorno($cfg->{targets}{'14all*stackgraph'}{$log})) {
