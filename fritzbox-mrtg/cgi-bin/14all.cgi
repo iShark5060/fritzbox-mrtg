@@ -404,7 +404,7 @@ sub set_graph_params($$$$) {
   my $acol   = $cfg->{config}{'14all*axiscolor'}    || '';
   my $frcol  = $cfg->{config}{'14all*framecolor'}   || '';
 
-  push @args, '--alt-y-mrtg', '--lazy', '--border 0',
+  push @args, '--alt-y-mrtg', '--lazy', '--border', '0',
     '-c', "MGRID$mgrid",
     '-c', "GRID$grid";
 

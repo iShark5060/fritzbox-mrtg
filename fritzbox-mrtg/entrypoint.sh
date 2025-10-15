@@ -119,7 +119,7 @@ if [ ! -f /etc/mrtg.cfg ]; then
   export DL_KBITS UL_KBITS CSS INTERVAL_MIN
   export COL_IN COL_OUT COL_MAXIN COL_MAXOUT
   export PAGE_BG GRID_COLOR MGRID_COLOR BACK_COLOR CANVAS_COLOR
-	export FONT_COLOR AXIS_COLOR FRAME_COLOR
+  export FONT_COLOR AXIS_COLOR FRAME_COLOR
 
   envsubst '
     ${FRITZBOX_MODEL}
@@ -156,7 +156,7 @@ fi
 
 if [ ! -f /srv/www/htdocs/index.html ]; then
   indexmaker --rrdviewer='/cgi-bin/14all.cgi' /etc/mrtg.cfg > /srv/www/htdocs/index.html || true
-	sed -i 's#</HEAD>#  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
+  sed -i 's#</HEAD>#  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
 fi
 
 while true; do
