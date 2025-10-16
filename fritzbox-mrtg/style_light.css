@@ -63,11 +63,11 @@ div#sysdetails {
   padding: 10px;
 }
 
-a, a:visited {
+font > a, font > a:visited {
   color: rgba(0, 0, 0, 0.85);
 }
 
-a:hover {
+font > a:hover {
   color: rgba(0, 0, 0, 0.5);
 }
 

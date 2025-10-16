@@ -8,6 +8,9 @@ to mrtg for pretty graphs and finally displayed to a simple website using \
 nginx."
 LABEL version="1.2"
 
+LABEL org.opencontainers.image.title="FritzBox MRTG Monitor"
+LABEL org.opencontainers.image.authors="Lutz Schwemer Panchez"
+LABEL org.opencontainers.image.vendor="shark5060"
 LABEL org.opencontainers.image.source=https://github.com/ishark5060/fritzbox-mrtg
 LABEL org.opencontainers.image.description="Simple, lightweight script that \
 uses upnp2mrtg to communicate with your Fritz!Box and collect bandwidth \
@@ -52,6 +55,7 @@ COPY ./fritzbox-mrtg/mrtg.cfg.tmpl /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/upnp2mrtg.sh /fritzbox-mrtg/
 COPY ./fritzbox-mrtg/style.css /fritzbox-mrtg/htdocs/
 COPY ./fritzbox-mrtg/style_light.css /fritzbox-mrtg/htdocs/
+COPY ./fritzbox-mrtg/favicon.ico /fritzbox-mrtg/htdocs/
 COPY ./fritzbox-mrtg/mrtg-l.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-m.png /fritzbox-mrtg/htdocs/icons/
 COPY ./fritzbox-mrtg/mrtg-r.png /fritzbox-mrtg/htdocs/icons/

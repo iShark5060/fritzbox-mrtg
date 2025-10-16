@@ -156,11 +156,20 @@ fi
 
 if [ ! -f /srv/www/htdocs/index.html ]; then
   indexmaker --rrdviewer='/cgi-bin/14all.cgi' /etc/mrtg.cfg > /srv/www/htdocs/index.html || true
-  sed -i 's#</HEAD>#  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
+  sed -i 's#</HEAD>#  <link rel="icon" type="image/x-icon" href="/favicon.ico">\n  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
 fi
 
 while true; do
   log "Fetch new data"
-  run_with_timeout 15 /usr/bin/mrtg /etc/mrtg.cfg || log "mrtg run failed"
+  if ! run_with_timeout 15 /usr/bin/mrtg /etc/mrtg.cfg; then
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+    log "mrtg run failed (attempt $FAIL_COUNT)"
+    if [ "$FAIL_COUNT" -ge 5 ]; then
+      log "ERROR: mrtg failed 5 times, exiting"
+      exit 1
+    fi
+  else
+    FAIL_COUNT=0
+  fi
   sleep "${POLL_INTERVAL}"
 done

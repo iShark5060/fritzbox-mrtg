@@ -3,7 +3,7 @@
 # Original copyright (C) 2005-2008 Michael Tomschitz
 # GPLv2 or later
 
-HOST="fritz.box"
+HOST="${HOST:-192.168.1.1}"
 PORT="49000"
 NETCAT="netcat"
 
