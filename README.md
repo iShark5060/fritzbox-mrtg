@@ -2,17 +2,20 @@
 
 ![Static Badge](https://img.shields.io/badge/Alpine-latest-red?style=for-the-badge) ![Static Badge](https://img.shields.io/badge/APK-green?style=for-the-badge&label=RRDtool) ![Static Badge](https://img.shields.io/badge/APK-blue?style=for-the-badge&label=MRTG) ![Static Badge](https://img.shields.io/badge/APK-yellow?style=for-the-badge&label=NGINX)
 
-Simple, lightweight script that uses `upnp2mrtg` to communicate with your
-Fritz!Box and collect bandwidth data. It's then sent to `mrtg` for pretty
-graphs and finally displayed to a simple website using `nginx`.
+Simple, lightweight script that uses `upnp2mrtg` to communicate with your Fritz!Box and collect bandwidth data. It's then sent to `rrdtool` and `mrtg` for pretty graphs and finally displayed to a simple website using `nginx` (with a little help of `14all.cgi`).
 
 The whole project is based on the work of [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/)
 
 ## About
 
-This is my first self-built docker container. Initially I wanted to use the Alpine base image, but for some reason the output to the `fritzbox.log` file would be corrupted (the script didn't output the 0 values), so I swapped over to Ubuntu as I was way more familiar with it. After getting everything working, I swapped to Debian because the image is appx. 200MB smaller without compromising any functionality (for this project).
+This is my first docker container project from "scratch". It's fully based on the project from [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/), but I've added and changed many parts over the iterations, that you can't really compare the two much anymore.
+The container is using an alpine base image, RRDtool and MRTG to display a traffic graph on a website serverd by NGINX. Supports SSL and dark mode.
 
-The script itself is more or less a direct copy from [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/) with some additions from me.
+The Fritzbox-MRTG project is licensed under [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+
+Fritzbox-monitoring base project by [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/)
+14all.cgi used from [Rainer Bawidamann](https://sourceforge.net/projects/my14all/)
+upnp2mrts used from [Michael Tomschitz](http://www.ANetzB.de/upnp2mrtg/) (Site seems to be down at the moment)
 
 ## Requirements
 
