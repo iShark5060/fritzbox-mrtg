@@ -110,6 +110,14 @@ else
   FRAME_COLOR="#888888"
 fi
 
+AUTOSCALE="${AUTOSCALE:-min}"
+case "$(printf '%s' "$AUTOSCALE" | tr '[:upper:]' '[:lower:]')" in
+  off|0|false|no|'')  ALTAUTOSCALE="";;
+  min|max|both)       ALTAUTOSCALE="$(printf '%s' "$AUTOSCALE" | tr '[:lower:]' '[:lower:]')";;
+  *)                  ALTAUTOSCALE="min";;  # fallback
+esac
+
+export ALTAUTOSCALE
 export COL_IN COL_OUT COL_MAXIN COL_MAXOUT
 export FONT_COLOR AXIS_COLOR FRAME_COLOR
 export PAGE_BG GRID_COLOR MGRID_COLOR BACK_COLOR CANVAS_COLOR
@@ -142,6 +150,7 @@ if [ ! -f /etc/mrtg.cfg ]; then
     ${FONT_COLOR}
     ${AXIS_COLOR}
     ${FRAME_COLOR}
+    ${ALTAUTOSCALE}
   ' < /fritzbox-mrtg/mrtg.cfg.tmpl > /etc/mrtg.cfg
 fi
 

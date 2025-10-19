@@ -102,6 +102,7 @@ my %myrules = (
   '14all*fontcolor'    => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*FontColor not in form '#rrggbb'"}],
   '14all*axiscolor'    => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*AxisColor not in form '#rrggbb'"}],
   '14all*framecolor'   => [sub{$_[0] =~ /^#[0-9a-f]{6}$/i}, sub{"14all*FrameColor not in form '#rrggbb'"}],
+  '14all*altautoscale' => [sub{ $_[0] =~ /^(min|max|both)$/i || $_[0] eq '' }, sub{"14all*AltAutoscale must be one of: min, max, both (or empty)"}],
 );
 
 my %graphparams = (
@@ -396,6 +397,12 @@ sub set_graph_params($$$$) {
   } elsif (yesorno($cfg->{targets}{'14all*logarithmic'}{$log})) {
     push @args, '-o';
   }
+
+  my $aas = lc($cfg->{config}{'14all*altautoscale'} || '');
+  if    ($aas eq 'both') { push @args, '--alt-autoscale'; }
+  elsif ($aas eq 'min')  { push @args, '--alt-autoscale-min'; }
+  elsif ($aas eq 'max')  { push @args, '--alt-autoscale-max'; }
+
   my $grid   = $cfg->{config}{'14all*gridcolor'}    || '#000000';
   my $mgrid  = $cfg->{config}{'14all*mgridcolor'}   || '#ee0000';
   my $back   = $cfg->{config}{'14all*backcolor'}    || '';

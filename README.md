@@ -40,6 +40,7 @@ services:
       - MAX_UPLOAD_BYTES=5000000
       - FRITZBOX_MODEL=7590
       - FRITZBOX_IP=192.168.1.1
+      - AUTOSCALE=min
     volumes:
       - /path/to/config:/srv/www/htdocs
     ports:
@@ -60,6 +61,7 @@ docker run -d \
   -e MAX_UPLOAD_BYTES=5000000 \
   -e FRITZBOX_MODEL=7590 \
   -e FRITZBOX_IP=192.168.1.1 \
+  -e AUTOSCALE=min \
   -p 3000:80 \
   -v /path/to/config:/srv/www/htdocs \
   --restart unless-stopped \
@@ -82,6 +84,7 @@ All binary variables use either `1` or `0` as value.
 | FRITZBOX_MODEL  | Model of the Fritz!Box being monitored. | `7590` |
 | FRITZBOX_IP  | IP address of the Fritz!Box being monitored. <br>Container needs to be able to reach this IP. | `192.168.1.1` |
 | USE_SSL  | Set to `1` to use SSL certificate and run an HTTPS server instead of an HTTP server. Port changes from :80 to :443 as well. See below. | `0` |
+| AUTOSCALE  | choose between `min`, `max`, `both`, `off` to autoscale graph. Min is best for low traffic. | | `min` |
 
 ## SSL Certificate
 
