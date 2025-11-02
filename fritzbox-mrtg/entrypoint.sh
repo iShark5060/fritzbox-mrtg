@@ -14,11 +14,27 @@ FRITZBOX_MODEL=${FRITZBOX_MODEL:-7590}
 FRITZBOX_IP=${FRITZBOX_IP:-192.168.1.1}
 USE_SSL=${USE_SSL:-0}
 
-INTERVAL_MIN=$((POLL_INTERVAL / 60))
-
 log() {
   printf "%s %s\n" "$(date -Is)" "$*"
 }
+
+# Validate numeric inputs
+case "${POLL_INTERVAL}" in
+  ''|*[!0-9]*) log "ERROR: POLL_INTERVAL must be numeric, got: ${POLL_INTERVAL}"; exit 1;;
+esac
+case "${MAX_DOWNLOAD_BYTES}" in
+  ''|*[!0-9]*) log "ERROR: MAX_DOWNLOAD_BYTES must be numeric, got: ${MAX_DOWNLOAD_BYTES}"; exit 1;;
+esac
+case "${MAX_UPLOAD_BYTES}" in
+  ''|*[!0-9]*) log "ERROR: MAX_UPLOAD_BYTES must be numeric, got: ${MAX_UPLOAD_BYTES}"; exit 1;;
+esac
+
+# Basic validation for FRITZBOX_IP (simple IP address format check)
+case "${FRITZBOX_IP}" in
+  *[!0-9.]*) log "WARNING: FRITZBOX_IP contains invalid characters: ${FRITZBOX_IP}";;
+esac
+
+INTERVAL_MIN=$((POLL_INTERVAL / 60))
 
 setup_timezone() {
   if [ -n "${TZ:-}" ]; then
@@ -113,7 +129,7 @@ fi
 AUTOSCALE="${AUTOSCALE:-min}"
 case "$(printf '%s' "$AUTOSCALE" | tr '[:upper:]' '[:lower:]')" in
   off|0|false|no|'')  ALTAUTOSCALE="";;
-  min|max|both)       ALTAUTOSCALE="$(printf '%s' "$AUTOSCALE" | tr '[:lower:]' '[:lower:]')";;
+  min|max|both)       ALTAUTOSCALE="$(printf '%s' "$AUTOSCALE" | tr '[:upper:]' '[:lower:]')";;
   *)                  ALTAUTOSCALE="min";;  # fallback
 esac
 
@@ -168,6 +184,7 @@ if [ ! -f /srv/www/htdocs/index.html ]; then
   sed -i 's#</HEAD>#  <link rel="icon" type="image/x-icon" href="/favicon.ico">\n  <link rel="stylesheet" type="text/css" href="/'${CSS}'">\n</HEAD>#' /srv/www/htdocs/index.html
 fi
 
+FAIL_COUNT=0
 while true; do
   log "Fetch new data"
   if ! run_with_timeout 15 /usr/bin/mrtg /etc/mrtg.cfg; then

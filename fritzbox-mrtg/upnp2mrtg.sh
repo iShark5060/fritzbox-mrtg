@@ -144,8 +144,7 @@ EOF
 ws_operation() {
   request="`soap_form "$1" WANCommonInterfaceConfig`"
   post="`request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1"`
-
-$request"
+$request`"
   rs="`get_response "$post"`"
   if [ $? -eq 0 ]; then
     echo "`get_attribute "$2" "$rs"`"
@@ -178,8 +177,7 @@ $rs" >> "$IGDXML"
     # get uptime
     request="`soap_form GetStatusInfo WANIPConnection`"
     post="`request_header "$HOST" "$PORT" "${#request}" WANIPConn1 WANIPConnection GetStatusInfo`
-
-$request"
+$request`"
     rs="`get_response "$post"`"
     if [ $? -eq 0 ]; then
       ut=`get_attribute NewUptime "$rs"`

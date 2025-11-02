@@ -74,6 +74,7 @@ RUN sed -i -e 's/\r$//' /entrypoint.sh \
   -e 's/\r$//' /fritzbox-mrtg/default.conf \
   -e 's/\r$//' /fritzbox-mrtg/default_ssl.conf \
   -e 's/\r$//' /etc/nginx/nginx.conf \
+  -e 's/\r$//' /srv/www/cgi-bin/14all.cgi \
   -e 's/\r$//' /fritzbox-mrtg/htdocs/style.css \
   -e 's/\r$//' /fritzbox-mrtg/htdocs/style_light.css
 
