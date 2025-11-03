@@ -3,6 +3,19 @@ body {
   color: rgba(0, 0, 0, 0.85);
   scrollbar-color: rgba(255, 255, 255, 0.28) rgb(166, 166, 166);
   scrollbar-width: auto;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 32px;
+  text-align: center;
+}
+
+body > table > tbody > tr > td > div > b {
+  font-family: "Titillium Web", sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 32px;
+  text-align: center;
 }
 
 h1 {
