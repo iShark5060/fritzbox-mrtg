@@ -143,8 +143,9 @@ EOF
 
 ws_operation() {
   request="`soap_form "$1" WANCommonInterfaceConfig`"
-  post="`request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1"`
-$request`"
+  header="`request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1"`"
+  post="${header}
+${request}"
   rs="`get_response "$post"`"
   if [ $? -eq 0 ]; then
     echo "`get_attribute "$2" "$rs"`"
@@ -174,16 +175,24 @@ $rs" >> "$IGDXML"
     done
     ;;
   *)
+    # Initialize variables
+    h="0 0"
+    m="0 0"
+    s="0 0"
+    
     # get uptime
     request="`soap_form GetStatusInfo WANIPConnection`"
-    post="`request_header "$HOST" "$PORT" "${#request}" WANIPConn1 WANIPConnection GetStatusInfo`
-$request`"
+    header="`request_header "$HOST" "$PORT" "${#request}" WANIPConn1 WANIPConnection GetStatusInfo`"
+    post="${header}
+${request}"
     rs="`get_response "$post"`"
     if [ $? -eq 0 ]; then
       ut=`get_attribute NewUptime "$rs"`
-      s=`modulo_time ${ut:-0} 60`
-      m=`modulo_time ${s% *} 60`
-      h=`modulo_time ${m% *} 24`
+      if [ -n "$ut" ]; then
+        s=`modulo_time ${ut:-0} 60`
+        m=`modulo_time ${s% *} 60`
+        h=`modulo_time ${m% *} 24`
+      fi
     fi
 
     # get data in/out
