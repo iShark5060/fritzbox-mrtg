@@ -88,7 +88,16 @@ get_attribute() {
 }
 
 modulo_time() {
-  echo "$((${1} / ${2})) $((${1} % ${2}))"
+  local val="${1:-0}"
+  local mod="${2:-1}"
+  # Ensure values are numeric, default to 0 if not
+  case "$val" in
+    ''|*[!0-9]*) val=0 ;;
+  esac
+  case "$mod" in
+    ''|*[!0-9]*|0) mod=1 ;;
+  esac
+  echo "$((${val} / ${mod})) $((${val} % ${mod}))"
 }
 
 shell_netcat() {
@@ -142,13 +151,12 @@ EOF
 }
 
 ws_operation() {
-  request="`soap_form "$1" WANCommonInterfaceConfig`"
-  header="`request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1"`"
-  post="${header}
-${request}"
-  rs="`get_response "$post"`"
+  request=$(soap_form "$1" WANCommonInterfaceConfig)
+  header=$(request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1")
+  post=$(printf '%s\n%s' "$header" "$request")
+  rs=$(get_response "$post")
   if [ $? -eq 0 ]; then
-    echo "`get_attribute "$2" "$rs"`"
+    get_attribute "$2" "$rs"
   fi
 }
 
@@ -183,25 +191,29 @@ $rs" >> "$IGDXML"
     # get uptime
     request="`soap_form GetStatusInfo WANIPConnection`"
     header="`request_header "$HOST" "$PORT" "${#request}" WANIPConn1 WANIPConnection GetStatusInfo`"
-    post="${header}
-${request}"
+    post=$(printf '%s\n%s' "$header" "$request")
     rs="`get_response "$post"`"
     if [ $? -eq 0 ]; then
-      ut=`get_attribute NewUptime "$rs"`
-      if [ -n "$ut" ]; then
-        s=`modulo_time ${ut:-0} 60`
-        m=`modulo_time ${s% *} 60`
-        h=`modulo_time ${m% *} 24`
+      ut=$(get_attribute NewUptime "$rs")
+      if [ -n "$ut" ] && [ "$ut" != "U" ]; then
+        ut="${ut:-0}"
+        s=$(modulo_time "$ut" 60)
+        s_first="${s% *}"
+        s_first="${s_first:-0}"
+        m=$(modulo_time "$s_first" 60)
+        m_first="${m% *}"
+        m_first="${m_first:-0}"
+        h=$(modulo_time "$m_first" 24)
       fi
     fi
 
     # get data in/out
-    if ${PACKET_MODE:-false}; then
-      b1="`ws_operation GetTotalPacketsReceived NewTotalPacketsReceived`"
-      b2="`ws_operation GetTotalPacketsSent NewTotalPacketsSent`"
+    if [ "${PACKET_MODE:-false}" = "true" ]; then
+      b1=$(ws_operation GetTotalPacketsReceived NewTotalPacketsReceived)
+      b2=$(ws_operation GetTotalPacketsSent NewTotalPacketsSent)
     else
-      b1="`ws_operation GetAddonInfos NewTotalBytesReceived`"
-      b2="`ws_operation GetAddonInfos NewTotalBytesSent`"
+      b1=$(ws_operation GetAddonInfos NewTotalBytesReceived)
+      b2=$(ws_operation GetAddonInfos NewTotalBytesSent)
     fi
 
     # output for mrtg (use U for unknown)
