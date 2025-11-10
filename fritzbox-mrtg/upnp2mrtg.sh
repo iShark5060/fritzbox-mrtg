@@ -7,6 +7,10 @@ HOST="${HOST:-192.168.1.1}"
 PORT="49000"
 NETCAT="netcat"
 
+LAST_STATUS_CODE=""
+LAST_STATUS_TEXT=""
+LAST_ERROR_MESSAGE=""
+
 # if available, read configuration
 [ -f /etc/upnp2mrtg.cfg ] && . /etc/upnp2mrtg.cfg
 
@@ -35,6 +39,10 @@ Usage: upnp2mrtg [-a <host>] [-p <port>] [-P] [-d] [-h] [-i] [-t] [-v] [-V]
   -v           show upnp2mrtg version and exit
   -V           be verbose for testing
 "
+
+log_error() {
+  printf '%s %s\n' "$(date -Is 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')" "$*" >&2
+}
 
 while getopts "a:dhi:p:PtvV" option; do
   case "$option" in
@@ -128,8 +136,38 @@ nc_cmd="$nc"
 $nc -h 2>&1 | grep -q ' -N ' && nc_cmd="$nc -N"
 
 get_response() {
+  LAST_STATUS_CODE=""
+  LAST_STATUS_TEXT=""
+  LAST_ERROR_MESSAGE=""
+
   _get_response_rs="$(echo "$1" | run_with_timeout 5 $nc_cmd "$HOST" "$PORT" 2>/dev/null)"
   _get_response_rv=$?
+
+  status_line="$(printf '%s\n' "$_get_response_rs" | head -n1)"
+  case "$status_line" in
+    HTTP/*)
+      LAST_STATUS_TEXT="$status_line"
+      LAST_STATUS_CODE="$(printf '%s' "$status_line" | awk '{print $2}')"
+      ;;
+    *)
+      LAST_STATUS_TEXT=""
+      LAST_STATUS_CODE=""
+      ;;
+  esac
+
+  if [ $_get_response_rv -ne 0 ]; then
+    LAST_ERROR_MESSAGE="netcat failed with exit $_get_response_rv"
+  else
+    case "$LAST_STATUS_CODE" in
+      ''|*[!0-9]*) ;;
+      *)
+        if [ "$LAST_STATUS_CODE" -ge 400 ] 2>/dev/null; then
+          LAST_ERROR_MESSAGE="HTTP error ${LAST_STATUS_CODE}"
+        fi
+        ;;
+    esac
+  fi
+
   echo "$_get_response_rs"
   if ${VERBOSE:-false}; then
     echo
@@ -155,9 +193,30 @@ ws_operation() {
   header=$(request_header "$HOST" "$PORT" "${#request}" WANCommonIFC1 WANCommonInterfaceConfig "$1")
   post=$(printf '%s\n%s' "$header" "$request")
   rs=$(get_response "$post")
-  if [ $? -eq 0 ]; then
-    get_attribute "$2" "$rs"
+  grc=$?
+  if [ $grc -ne 0 ]; then
+    log_error "upnp2mrtg: request '$1' failed (${LAST_ERROR_MESSAGE:-exit $grc})"
+    return $grc
   fi
+
+  case "$LAST_STATUS_CODE" in
+    ''|*[!0-9]*) ;;
+    *)
+      if [ "$LAST_STATUS_CODE" -ge 400 ] 2>/dev/null; then
+        log_error "upnp2mrtg: HTTP ${LAST_STATUS_CODE} for action '$1'"
+        return 1
+      fi
+      ;;
+  esac
+
+  value=$(get_attribute "$2" "$rs")
+  if [ -z "$value" ]; then
+    log_error "upnp2mrtg: missing attribute '$2' in response to '$1' (status ${LAST_STATUS_CODE:-unknown})"
+    return 1
+  fi
+
+  printf '%s\n' "$value"
+  return 0
 }
 
 case "$MODE" in
@@ -192,28 +251,50 @@ $rs" >> "$IGDXML"
     request="`soap_form GetStatusInfo WANIPConnection`"
     header="`request_header "$HOST" "$PORT" "${#request}" WANIPConn1 WANIPConnection GetStatusInfo`"
     post=$(printf '%s\n%s' "$header" "$request")
-    rs="`get_response "$post"`"
-    if [ $? -eq 0 ]; then
-      ut=$(get_attribute NewUptime "$rs")
-      if [ -n "$ut" ] && [ "$ut" != "U" ]; then
-        ut="${ut:-0}"
-        s=$(modulo_time "$ut" 60)
-        s_first="${s% *}"
-        s_first="${s_first:-0}"
-        m=$(modulo_time "$s_first" 60)
-        m_first="${m% *}"
-        m_first="${m_first:-0}"
-        h=$(modulo_time "$m_first" 24)
-      fi
+    rs=$(get_response "$post")
+    grc=$?
+    if [ $grc -ne 0 ]; then
+      log_error "upnp2mrtg: GetStatusInfo failed (${LAST_ERROR_MESSAGE:-exit $grc})"
+    else
+      case "$LAST_STATUS_CODE" in
+        ''|*[!0-9]*) ;;
+        *)
+          if [ "$LAST_STATUS_CODE" -ge 400 ] 2>/dev/null; then
+            log_error "upnp2mrtg: HTTP ${LAST_STATUS_CODE} for GetStatusInfo"
+          else
+            ut=$(get_attribute NewUptime "$rs")
+            if [ -n "$ut" ] && [ "$ut" != "U" ]; then
+              ut="${ut:-0}"
+              s=$(modulo_time "$ut" 60)
+              s_first="${s% *}"
+              s_first="${s_first:-0}"
+              m=$(modulo_time "$s_first" 60)
+              m_first="${m% *}"
+              m_first="${m_first:-0}"
+              h=$(modulo_time "$m_first" 24)
+            else
+              log_error "upnp2mrtg: missing uptime data in response"
+            fi
+          fi
+          ;;
+      esac
     fi
 
     # get data in/out
     if [ "${PACKET_MODE:-false}" = "true" ]; then
-      b1=$(ws_operation GetTotalPacketsReceived NewTotalPacketsReceived)
-      b2=$(ws_operation GetTotalPacketsSent NewTotalPacketsSent)
+      b1=$(ws_operation GetTotalPacketsReceived NewTotalPacketsReceived) || {
+        log_error "upnp2mrtg: failed to fetch total packets received"; b1="U";
+      }
+      b2=$(ws_operation GetTotalPacketsSent NewTotalPacketsSent) || {
+        log_error "upnp2mrtg: failed to fetch total packets sent"; b2="U";
+      }
     else
-      b1=$(ws_operation GetAddonInfos NewTotalBytesReceived)
-      b2=$(ws_operation GetAddonInfos NewTotalBytesSent)
+      b1=$(ws_operation GetAddonInfos NewTotalBytesReceived) || {
+        log_error "upnp2mrtg: failed to fetch total bytes received"; b1="U";
+      }
+      b2=$(ws_operation GetAddonInfos NewTotalBytesSent) || {
+        log_error "upnp2mrtg: failed to fetch total bytes sent"; b2="U";
+      }
     fi
 
     # output for mrtg (use U for unknown)
