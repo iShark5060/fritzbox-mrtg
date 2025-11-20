@@ -40,9 +40,15 @@ setup_timezone() {
   if [ -n "${TZ:-}" ]; then
     TZ_FILE="/usr/share/zoneinfo/$TZ"
     if [ -f "$TZ_FILE" ]; then
-      ln -snf "$TZ_FILE" /etc/localtime
-      echo "$TZ" >/etc/timezone || true
-      log "Timezone set to: $TZ"
+      # Try to set /etc/localtime if we have root permissions
+      if ln -snf "$TZ_FILE" /etc/localtime 2>/dev/null; then
+        echo "$TZ" >/etc/timezone 2>/dev/null || true
+        log "Timezone set to: $TZ (via /etc/localtime)"
+      else
+        # For non-root users, use TZ environment variable instead
+        export TZ
+        log "Timezone set to: $TZ (via TZ environment variable)"
+      fi
     else
       log "Cannot set timezone \"$TZ\": timezone not found"
     fi
@@ -78,12 +84,19 @@ run_with_timeout() {
 
 setup_timezone
 
-# Detect current user and group (fallback to nginx if not set)
-NGINX_USER="${NGINX_USER:-$(id -un)}"
-NGINX_GROUP="${NGINX_GROUP:-$(id -gn)}"
+# Use a standard user for fastcgi that exists on most systems
+# 'nobody' is a standard unprivileged user that exists on virtually all Unix systems
+FCGI_USER="${FCGI_USER:-nobody}"
+FCGI_GROUP="${FCGI_GROUP:-nobody}"
 
-# Update nginx.conf to use the current user
-sed -i "s/^user .*/user ${NGINX_USER};/" /etc/nginx/nginx.conf
+# Verify the user exists, fallback to nginx if it doesn't
+if ! getent passwd "${FCGI_USER}" >/dev/null 2>&1; then
+  FCGI_USER="nginx"
+  FCGI_GROUP="nginx"
+fi
+
+# Update nginx.conf to use nginx user (standard for nginx)
+sed -i "s/^user .*/user nginx;/" /etc/nginx/nginx.conf 2>/dev/null || true
 
 mkdir -p /run/nginx /etc/nginx/http.d
 mkdir -p /srv/www/htdocs/icons
@@ -92,14 +105,14 @@ if [ ! -f /srv/www/htdocs/style.css ] || \
   cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
 fi
 
-# Fix permissions for mounted volumes - ensure nginx can read/write
-chown -R "${NGINX_USER}:${NGINX_GROUP}" /srv/www/htdocs 2>/dev/null || true
+# Fix permissions for mounted volumes - ensure nginx and fastcgi can read/write
+chown -R nginx:nginx /srv/www/htdocs 2>/dev/null || true
 chmod -R 755 /srv/www/htdocs 2>/dev/null || true
 
 if [ "${USE_SSL}" = "1" ]; then
-  cp /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
+  cp -f /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
 else
-  cp /fritzbox-mrtg/default.conf /etc/nginx/http.d/default.conf
+  cp -f /fritzbox-mrtg/default.conf /etc/nginx/http.d/default.conf
 fi
 
 DL_KBITS=$((MAX_DOWNLOAD_BYTES * 8 / 1000))
@@ -184,7 +197,8 @@ fi
 printf 'HOST="%s"\nNETCAT="nc"\n' "${FRITZBOX_IP}" > /etc/upnp2mrtg.cfg
 
 mkdir -p /run
-spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u "${NGINX_USER}" -g "${NGINX_GROUP}" /usr/bin/fcgiwrap
+# Run spawn-fcgi as a standard unprivileged user (nobody or nginx)
+spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u "${FCGI_USER}" -g "${FCGI_GROUP}" /usr/bin/fcgiwrap
 
 if [ "${RUN_WEBSERVER}" = "1" ]; then
   nginx
