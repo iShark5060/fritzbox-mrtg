@@ -85,6 +85,10 @@ if [ ! -f /srv/www/htdocs/style.css ] || \
   cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
 fi
 
+# Fix permissions for mounted volumes - ensure nginx can read/write
+chown -R nginx:nginx /srv/www/htdocs 2>/dev/null || true
+chmod -R 755 /srv/www/htdocs 2>/dev/null || true
+
 if [ "${USE_SSL}" = "1" ]; then
   cp /fritzbox-mrtg/default_ssl.conf /etc/nginx/http.d/default.conf
 else
