@@ -18,7 +18,6 @@ log() {
   printf "%s %s\n" "$(date -Is)" "$*"
 }
 
-# Validate numeric inputs
 case "${POLL_INTERVAL}" in
   ''|*[!0-9]*) log "ERROR: POLL_INTERVAL must be numeric, got: ${POLL_INTERVAL}"; exit 1;;
 esac
@@ -29,7 +28,6 @@ case "${MAX_UPLOAD_BYTES}" in
   ''|*[!0-9]*) log "ERROR: MAX_UPLOAD_BYTES must be numeric, got: ${MAX_UPLOAD_BYTES}"; exit 1;;
 esac
 
-# Basic validation for FRITZBOX_IP (simple IP address format check)
 case "${FRITZBOX_IP}" in
   *[!0-9.]*) log "WARNING: FRITZBOX_IP contains invalid characters: ${FRITZBOX_IP}";;
 esac
@@ -40,12 +38,10 @@ setup_timezone() {
   if [ -n "${TZ:-}" ]; then
     TZ_FILE="/usr/share/zoneinfo/$TZ"
     if [ -f "$TZ_FILE" ]; then
-      # Try to set /etc/localtime if we have root permissions
       if ln -snf "$TZ_FILE" /etc/localtime 2>/dev/null; then
         echo "$TZ" >/etc/timezone 2>/dev/null || true
         log "Timezone set to: $TZ (via /etc/localtime)"
       else
-        # For non-root users, use TZ environment variable instead
         export TZ
         log "Timezone set to: $TZ (via TZ environment variable)"
       fi
@@ -64,7 +60,6 @@ cleanup() {
 }
 trap cleanup TERM INT EXIT
 
-# Cross-platform timeout wrapper for commands
 run_with_timeout() {
   if timeout 0.1s true >/dev/null 2>&1; then
     timeout "$@"; return $?
@@ -84,28 +79,21 @@ run_with_timeout() {
 
 setup_timezone
 
-# Use a standard user for fastcgi that exists on most systems
-# 'nobody' is a standard unprivileged user that exists on virtually all Unix systems
 FCGI_USER="${FCGI_USER:-nobody}"
 FCGI_GROUP="${FCGI_GROUP:-nobody}"
-
-# Verify the user exists, fallback to nginx if it doesn't
 if ! getent passwd "${FCGI_USER}" >/dev/null 2>&1; then
   FCGI_USER="nginx"
   FCGI_GROUP="nginx"
 fi
 
-# Update nginx.conf to use nginx user (standard for nginx)
-sed -i "s/^user .*/user nginx;/" /etc/nginx/nginx.conf 2>/dev/null || true
-
 mkdir -p /run/nginx /etc/nginx/http.d
 mkdir -p /srv/www/htdocs/icons
+
 if [ ! -f /srv/www/htdocs/style.css ] || \
    [ ! -f /srv/www/htdocs/icons/mrtg-l.png ]; then
   cp -r /fritzbox-mrtg/htdocs/* /srv/www/htdocs/
 fi
 
-# Fix permissions for mounted volumes - ensure nginx and fastcgi can read/write
 chown -R nginx:nginx /srv/www/htdocs 2>/dev/null || true
 chmod -R 755 /srv/www/htdocs 2>/dev/null || true
 
@@ -154,7 +142,7 @@ AUTOSCALE="${AUTOSCALE:-min}"
 case "$(printf '%s' "$AUTOSCALE" | tr '[:upper:]' '[:lower:]')" in
   off|0|false|no|'')  ALTAUTOSCALE="";;
   min|max|both)       ALTAUTOSCALE="$(printf '%s' "$AUTOSCALE" | tr '[:upper:]' '[:lower:]')";;
-  *)                  ALTAUTOSCALE="min";;  # fallback
+  *)                  ALTAUTOSCALE="min";;
 esac
 
 export ALTAUTOSCALE
@@ -197,7 +185,6 @@ fi
 printf 'HOST="%s"\nNETCAT="nc"\n' "${FRITZBOX_IP}" > /etc/upnp2mrtg.cfg
 
 mkdir -p /run
-# Run spawn-fcgi as a standard unprivileged user (nobody or nginx)
 spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u "${FCGI_USER}" -g "${FCGI_GROUP}" /usr/bin/fcgiwrap
 
 if [ "${RUN_WEBSERVER}" = "1" ]; then
