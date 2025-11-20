@@ -78,6 +78,13 @@ run_with_timeout() {
 
 setup_timezone
 
+# Detect current user and group (fallback to nginx if not set)
+NGINX_USER="${NGINX_USER:-$(id -un)}"
+NGINX_GROUP="${NGINX_GROUP:-$(id -gn)}"
+
+# Update nginx.conf to use the current user
+sed -i "s/^user .*/user ${NGINX_USER};/" /etc/nginx/nginx.conf
+
 mkdir -p /run/nginx /etc/nginx/http.d
 mkdir -p /srv/www/htdocs/icons
 if [ ! -f /srv/www/htdocs/style.css ] || \
@@ -86,7 +93,7 @@ if [ ! -f /srv/www/htdocs/style.css ] || \
 fi
 
 # Fix permissions for mounted volumes - ensure nginx can read/write
-chown -R nginx:nginx /srv/www/htdocs 2>/dev/null || true
+chown -R "${NGINX_USER}:${NGINX_GROUP}" /srv/www/htdocs 2>/dev/null || true
 chmod -R 755 /srv/www/htdocs 2>/dev/null || true
 
 if [ "${USE_SSL}" = "1" ]; then
@@ -177,7 +184,7 @@ fi
 printf 'HOST="%s"\nNETCAT="nc"\n' "${FRITZBOX_IP}" > /etc/upnp2mrtg.cfg
 
 mkdir -p /run
-spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u nginx -g nginx /usr/bin/fcgiwrap
+spawn-fcgi -s /run/fcgiwrap.sock -M 766 -u "${NGINX_USER}" -g "${NGINX_GROUP}" /usr/bin/fcgiwrap
 
 if [ "${RUN_WEBSERVER}" = "1" ]; then
   nginx
