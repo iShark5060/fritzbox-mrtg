@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# FritzBox-MRTG quality gate: Docker image build smoke test.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+echo '==> docker build'
+docker build -f dockerfile -t fritzbox-mrtg:validate .
+echo '==> validate passed'

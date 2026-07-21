@@ -1,6 +1,11 @@
 # Monitor your FRITZ!Box
 
-![Static Badge](https://img.shields.io/badge/Alpine-latest-red?style=for-the-badge) ![Static Badge](https://img.shields.io/badge/APK-green?style=for-the-badge&label=RRDtool) ![Static Badge](https://img.shields.io/badge/APK-blue?style=for-the-badge&label=MRTG) ![Static Badge](https://img.shields.io/badge/APK-yellow?style=for-the-badge&label=NGINX)
+[![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/ci.yml/badge.svg)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/ci.yml)
+[![PR](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/pr.yml/badge.svg)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/pr.yml)
+![Alpine](https://img.shields.io/badge/Alpine-latest-red?logo=alpinelinux&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-image-2496ED?logo=docker&logoColor=white)
+[![Cursor](https://img.shields.io/badge/Cursor-IDE-141414?logo=cursor&logoColor=white)](https://cursor.com)
 
 Simple, lightweight script that uses `upnp2mrtg` to communicate with your Fritz!Box and collect bandwidth data. It's then sent to `rrdtool` and `mrtg` for pretty graphs and finally displayed to a simple website using `nginx` (with a little help of `14all.cgi`).
 
@@ -22,7 +27,7 @@ upnp2mrts used from [Michael Tomschitz](http://www.ANetzB.de/upnp2mrtg/) (Site s
 - Docker, Podman or some other way of running the container
 - Fritz!Box with UPNP enabled (Home Network -> Network -> Transmit status information over UPnP)
 
-## Running the Container
+## Quick start
 
 Docker compose (recommended):
 ```
@@ -133,3 +138,15 @@ Rateup WARNING: /usr/bin/rateup The backup log file for fritzbox was invalid as 
 Rateup WARNING: /usr/bin/rateup Can't rename fritzbox.log to fritzbox.old updating log file
 ```
 This is normal and expected behavior due to how `rateup` handles the file opening. More information in the [MRTG GitHub](https://github.com/oetiker/mrtg/blob/master/src/src/rateup.c#L1328)
+
+## Scripts
+
+| Script             | Description                          |
+| ------------------ | ------------------------------------ |
+| `scripts/validate` | `docker build` smoke test (CI gate). |
+
+## Development
+
+Agent-oriented docs: [openwiki/quickstart.md](openwiki/quickstart.md).
+
+Engineering standards: AppBase `docs/org-standards/` with [personal-repos.md](https://github.com/Dark-Avian-Labs/AppBase/blob/main/docs/org-standards/personal-repos.md) (GitHub-hosted runners).
