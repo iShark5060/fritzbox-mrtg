@@ -1,23 +1,19 @@
 # FritzBox-MRTG
 
-Alpine Docker image that polls a FRITZ!Box via UPnP and graphs bandwidth with MRTG / RRDtool / nginx.
+## Org standards
 
-## Engineering standards
+CI/README/validate conventions live in AppBase `docs/org-standards/` with personal-repo overrides (`personal-repos.md`). GitHub-hosted `ubuntu-latest`, not Blacksmith. Quality gate: `scripts/validate` (`docker build -f dockerfile`). Dockerfile is lowercase `dockerfile` at the repo root; image content lives under `fritzbox-mrtg/`.
 
-Follow AppBase `docs/org-standards/` with personal-repo overrides (`personal-repos.md`):
+## Overview
 
-- Runners: `ubuntu-latest`
-- Checkout: `actions/checkout@v7`
-- Quality gate: `scripts/validate` (`docker build`)
+Alpine image that polls a FRITZ!Box over UPnP (`upnp2mrtg`), graphs with MRTG / RRDtool, and serves via nginx (`14all.cgi`). User-facing env and compose: `README.md`.
 
-## OpenWiki
+## Persistence
 
-This repository has documentation located in the /openwiki directory.
+Mount `/srv/www/htdocs` for RRD, logs, and HTML. Optional SSL: mount `/etc/nginx/ssl/` with `cert.pem` + `cert.key` and set `USE_SSL=1` (nginx listens on **443** in-container).
 
-Start here:
+`/etc/mrtg.cfg` is generated from the template only when missing. Changing bandwidth caps, dark mode, model, or poll interval on an existing container does **not** rewrite MRTG config until that file is gone or the container filesystem is recreated. `/etc/upnp2mrtg.cfg` **is** rewritten every start from `FRITZBOX_IP`. Volume `style.css` / `index.html` are seeded only if absent: delete `style.css` to restore stock assets; a stale `index.html` can keep an old stylesheet link after flipping `USE_DARKMODE`.
 
-- [OpenWiki quickstart](openwiki/quickstart.md)
+## Runtime
 
-OpenWiki includes repository overview, architecture notes, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
-
-When working in this repository, read the OpenWiki quickstart first, then follow its links to the relevant architecture, workflow, domain, operation, and testing notes.
+Fritz UPnP status export must be on; the container must reach `FRITZBOX_IP`. Binary flags are `0`/`1`. `POLL_INTERVAL` seconds become MRTG `Interval` via integer minutes (`/ 60`). Five consecutive `mrtg` failures exit the process. First-boot Rateup “could not read primary log file” warnings are normal.
