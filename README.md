@@ -1,30 +1,19 @@
 # Monitor your FRITZ!Box
 
-[![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/ci.yml/badge.svg)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/ci.yml)
-[![PR](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/pr.yml/badge.svg)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/pr.yml)
-![Alpine](https://img.shields.io/badge/Alpine-latest-red?logo=alpinelinux&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-image-2496ED?logo=docker&logoColor=white)
-[![Cursor](https://img.shields.io/badge/Cursor-IDE-141414?logo=cursor&logoColor=white)](https://cursor.com)
+[![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue.svg?style=flat-square)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/iShark5060/fritzbox-monitoring/ci.yml?style=flat-square&label=CI)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/ci.yml)
+[![PR](https://img.shields.io/github/actions/workflow/status/iShark5060/fritzbox-monitoring/pr.yml?style=flat-square&label=PR)](https://github.com/iShark5060/fritzbox-monitoring/actions/workflows/pr.yml)
+![Alpine](https://img.shields.io/badge/Alpine-latest-red?logo=alpinelinux&logoColor=white&style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-image-2496ED?logo=docker&logoColor=white&style=flat-square)
+[![Cursor](https://img.shields.io/badge/Cursor-IDE-141414?logo=cursor&logoColor=white&style=flat-square)](https://cursor.com)
 
-Reads bandwidth from a Fritz!Box over UPnP (`upnp2mrtg`), stores it in RRDtool via MRTG, and serves graphs from nginx (with `14all.cgi`). Alpine image. SSL and dark mode.
+Graphs for a Fritz!Box uplink. The container polls bandwidth over UPnP, stores it in RRDtool via MRTG, and serves the pictures from nginx. Dark mode. SSL if you already have a cert.
 
-The whole project is based on the work of [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/)
+This started as [Thorsten Kukuk's fritzbox-monitoring](https://github.com/thkukuk/fritzbox-monitoring/). Enough has changed that the two are hard to compare. Alpine, RRDtool, MRTG, nginx. It was my first Docker image from scratch.
 
-## About
+Enable UPnP on the box first: Home Network → Network → Transmit status information over UPnP.
 
-This is my first Docker image from scratch. It started as [Thorsten Kukuk's fritzbox-monitoring](https://github.com/thkukuk/fritzbox-monitoring/). Enough has changed that the two are hard to compare. Alpine, RRDtool, MRTG, nginx. SSL and dark mode.
-
-The Fritzbox-MRTG project is licensed under [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-
-Fritzbox-monitoring base project by [Thorsten Kukuk](https://github.com/thkukuk/fritzbox-monitoring/)
-14all.cgi used from [Rainer Bawidamann](https://sourceforge.net/projects/my14all/)
-upnp2mrtg used from [Michael Tomschitz](http://www.ANetzB.de/upnp2mrtg/) (site seems to be down)
-
-## Requirements
-
-- Docker, Podman or some other way of running the container
-- Fritz!Box with UPNP enabled (Home Network -> Network -> Transmit status information over UPnP)
+14all.cgi is from [Rainer Bawidamann](https://sourceforge.net/projects/my14all/). upnp2mrtg is from [Michael Tomschitz](http://www.ANetzB.de/upnp2mrtg/). GPLv2.
 
 ## Quick start
 
@@ -144,14 +133,3 @@ Rateup WARNING: /usr/bin/rateup Can't rename fritzbox.log to fritzbox.old updati
 
 This is normal and expected behavior due to how `rateup` handles the file opening. More information in the [MRTG GitHub](https://github.com/oetiker/mrtg/blob/master/src/src/rateup.c#L1328)
 
-## Scripts
-
-| Script             | Description                          |
-| ------------------ | ------------------------------------ |
-| `scripts/validate` | `docker build` smoke test (CI gate). |
-
-## Development
-
-Agent notes: [AGENTS.md](AGENTS.md).
-
-Engineering standards: AppBase `docs/org-standards/` with [personal-repos.md](https://github.com/Dark-Avian-Labs/AppBase/blob/main/docs/org-standards/personal-repos.md) (GitHub-hosted runners).
